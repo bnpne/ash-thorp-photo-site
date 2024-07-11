@@ -1,0 +1,33 @@
+@import 'reset.scss';
+@import 'fonts.scss';
+@import 'colors.scss';
+@import 'functions.scss';
+@import 'scale.scss';
+@import 'scroll.scss';
+@import 'base.scss';
+
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+body {
+  min-height: 100vh;
+  @include mobile() {
+    min-height: 100svh;
+  }
+}
+
+svg.icon {
+  path[fill],
+  rect[fill],
+  circle[fill] {
+    fill: currentColor;
+  }
+
+  path[stroke],
+  rect[stroke],
+  circle[stroke] {
+    stroke: currentColor;
+  }
+}

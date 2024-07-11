@@ -1,0 +1,56 @@
+body {
+  background: $white;
+  color: #212121;
+  @include base-font();
+}
+
+#main {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  min-height: 100vh;
+  z-index: 1;
+
+  @include mobile() {
+    min-height: 100svh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+}
+
+#page {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 2;
+
+  @include mobile() {
+    min-height: 100svh;
+  }
+}
+
+#canvas {
+  position: fixed;
+  pointer-events: none;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.t {
+  position: fixed;
+  // background: red;
+  background: $black;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  pointer-events: none;
+}
+
+a {
+  @include primary-link();
+}

@@ -1,0 +1,8 @@
+{
+  "name": "ash-thorp-photo",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm --stream -r run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
