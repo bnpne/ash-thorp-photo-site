@@ -24,6 +24,7 @@ body {
   min-height: 100vh;
   position: relative;
   z-index: 2;
+  padding: desktop-vw(20px);
 
   @include mobile() {
     min-height: 100svh;

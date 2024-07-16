@@ -9,6 +9,7 @@ export default defineNuxtPlugin(app => {
 
     if (_canvas.value) {
       RInstance = new R(_canvas.value)
+      startEngine()
     }
   }
 
@@ -17,7 +18,7 @@ export default defineNuxtPlugin(app => {
     let raw = toRaw(content)
     await RInstance.loadPhotos(raw).then(p => {
       if (p.length === raw.length) {
-        startEngine()
+        handleScroll()
       }
     })
   }
@@ -30,10 +31,21 @@ export default defineNuxtPlugin(app => {
     RInstance.stopEngine()
   }
 
+  const loadElements = elements => {
+    RInstance.loadElements(elements)
+  }
+
+  const handleScroll = () => {
+    app.$lenis.on('scroll', ({scroll}) => {
+      RInstance.updateScroll(scroll)
+    })
+  }
+
   return {
     provide: {
       setup,
       load,
+      loadElements,
       startEngine,
       stopEngine,
     },

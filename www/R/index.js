@@ -9,6 +9,8 @@ export default class R {
     this.canvas = canvas
     this.sizes = new Sizes()
     this.photoArray = []
+    this.elements = []
+    this.scroll = 0
 
     this.init()
     this.listeners()
@@ -62,11 +64,32 @@ export default class R {
     })
   }
 
+  loadElements(elements) {
+    this.elements = elements
+
+    if (this.photoArray.length === this.elements.length) {
+      this.photoArray.forEach((photo, i) => {
+        photo.addElement(this.elements[photo.index])
+      })
+    }
+  }
+
   /**
    * Load Photos
    */
   createPositions() {
     // initial grid
+  }
+
+  /**
+   * Handle Scroll
+   */
+  updateScroll(scroll) {
+    this.scroll = scroll
+
+    if (this.photoArray.length > 0) {
+      this.photoArray.forEach(photo => photo.updateScroll(this.scroll))
+    }
   }
 
   /**

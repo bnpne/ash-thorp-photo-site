@@ -19,7 +19,6 @@ export default defineType({
       name: 'title',
       title: 'Photo Title',
       type: 'string',
-      validation: r => r.required(),
     }),
     defineField({
       name: 'snippet',

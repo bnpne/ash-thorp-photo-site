@@ -69,10 +69,12 @@
 }
 
 @mixin base-font {
-  font-family: 'cardo-reg';
+  font-family: 'IBM Plex Mono', monospace;
   font-weight: 400;
-  font-size: 14px;
-  line-height: 16.8px;
+  font-style: normal;
+  font-size: 10px;
+  line-height: 11px;
+  text-transform: uppercase;
 
   @media (min-width: 2800px) {
     font-size: 1vw;

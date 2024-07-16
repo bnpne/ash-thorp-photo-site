@@ -1,5 +1,7 @@
 <script setup>
-const { $load, $startEngine } = useNuxtApp()
+import gsap from 'gsap'
+
+const { $load } = useNuxtApp()
 
 // Query Sanity
 const query = groq`*[_type=='main']{..., photos[]->{..., photo{..., asset->}}}`
@@ -19,6 +21,8 @@ onMounted(() => {
 
 <template>
   <main id='main'>
+    <PL />
+    <Nav />
     <NuxtPage />
     <Canvas />
   </main>

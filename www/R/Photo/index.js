@@ -5,7 +5,9 @@ import Sizes from '../Sizes'
 
 export default class Photo {
   constructor({data, index}) {
-    console.log(data)
+    this.element = null
+    this.scroll = 0
+
     // Image Transform
     const IMG_TRANSFORM = '?auto=format&w=2000'
 
@@ -109,28 +111,53 @@ export default class Photo {
     this.resize()
   }
 
+  addElement(element) {
+    this.element = element
+    this.setPosition()
+  }
+
   setScale() {
-    if (this.metadata.dimensions.aspectRatio > 0) {
-      let w = calcViewWidth(150, this.sizes)
-      let h = w / this.metadata.dimensions.aspectRatio
+    let b = calcViewWidth(150, this.sizes)
 
-      this.scale.x = w
-      this.scale.y = h
-    } else {
-      let h = calcViewWidth(150, this.sizes)
-      let w = h * this.metadata.dimensions.aspectRatio
-
-      this.scale.x = w
-      this.scale.y = h
+    if (this.metadata.dimensions.aspectRatio >= 1) {
+      this.scale.x = b
+      this.scale.y = b / this.metadata.dimensions.aspectRatio
+    } else if (this.metadata.dimensions.aspectRatio < 1) {
+      this.scale.x = b * this.metadata.dimensions.aspectRatio
+      this.scale.y = b
     }
 
-    if (this.scale.x > 0 && this.scale.y > 0) {
-      this.mesh.scale.set(this.scale.x, this.scale.y, 1)
-    }
+    this.mesh.scale.set(this.scale.x, this.scale.y, 1)
   }
 
   setPosition() {
-    this.mesh.position.set(500 * this.index, 0, 0)
+    if (this.element) {
+      let bounds = this.element.getBoundingClientRect()
+      // let x = bounds.left - this.sizes.width / 2 + bounds.width / 2
+      let x = bounds.left - this.sizes.width / 2 + this.mesh.scale.x / 2
+      let y =
+        -this.scroll -
+        bounds.top +
+        this.sizes.height / 2 -
+        bounds.height / 2 +
+        this.scroll
+
+      this.mesh.position.x = x
+      this.mesh.position.y = y
+    }
+  }
+
+  updateScroll(scroll) {
+    this.scroll = scroll
+    let bounds = this.element.getBoundingClientRect()
+    let y =
+      -this.scroll -
+      bounds.top +
+      this.sizes.height / 2 -
+      bounds.height / 2 +
+      this.scroll
+
+    this.mesh.position.y = y
   }
 
   resize() {
