@@ -11,6 +11,9 @@ export default class R {
     this.photoArray = []
     this.elements = []
     this.scroll = 0
+    this.isRaycasting = false
+    this.raycaster
+    this.pointer
 
     this.init()
     this.listeners()
@@ -43,6 +46,8 @@ export default class R {
     this.scene.add(this.camera)
 
     this.createPositions()
+
+    this.initRaycaster()
 
     this.resize()
   }
@@ -93,6 +98,35 @@ export default class R {
   }
 
   /**
+   * Raycaster
+   */
+  initRaycaster() {
+    this.raycaster = new THREE.Raycaster()
+    this.pointer = new THREE.Vector2()
+  }
+
+  pointerMove(e) {
+    this.pointer.x = (e.clientX / this.sizes.width) * 2 - 1
+    this.pointer.y = -(e.clientY / this.sizes.height) * 2 + 1
+  }
+
+  handleIntersecting(intersects) {
+    if (intersects[0]) {
+      document.body.style.cursor = 'pointer'
+      this.gridHoverIndex = intersects[0]?.object.key
+    } else {
+      document.body.style.cursor = 'auto'
+      this.gridHoverIndex = null
+    }
+  }
+
+  handleClick() {
+    if (this.isRaycasting && this.gridHoverIndex !== null) {
+      console.log(this.gridHoverIndex)
+    }
+  }
+
+  /**
    * Resize
    */
   resize() {
@@ -112,6 +146,8 @@ export default class R {
    */
   listeners() {
     window.addEventListener('resize', this.resize.bind(this))
+    window.addEventListener('pointermove', this.pointerMove.bind(this))
+    window.addEventListener('click', this.handleClick.bind(this))
   }
 
   /**
@@ -127,6 +163,16 @@ export default class R {
 
   raf = () => {
     this.renderer.render(this.scene, this.camera)
+
+    if (this.raycaster) {
+      this.isRaycasting = true
+      this.raycaster.setFromCamera(this.pointer, this.camera)
+
+      // calculate objects intersecting the picking ray
+      this.intersects = this.raycaster.intersectObjects(this.scene.children)
+
+      this.handleIntersecting(this.intersects)
+    }
 
     requestAnimationFrame(this.raf)
   }

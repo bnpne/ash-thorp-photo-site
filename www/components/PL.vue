@@ -20,6 +20,7 @@
 <style lang="scss">
 .pl {
   position: fixed;
+  pointer-events: none;
   top: 0;
   left: 0;
   height: 100vh;

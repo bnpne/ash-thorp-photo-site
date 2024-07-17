@@ -23,18 +23,17 @@ onMounted(async () => {
     })
     tl.to(plt, {
       opacity: 1,
-      delay: 1,
+      delay: 2,
       stagger: {
-        each: .5,
+        each: .3,
         from: 'edges',
-        ease: 'easeOutQuint',
       }
     }, '<')
       .to('.pl', {
         opacity: 0,
         duration: 1,
         ease: 'easeOutQuint',
-      }, '>')
+      }, '>+=.6')
 
     $loadElements(p)
 

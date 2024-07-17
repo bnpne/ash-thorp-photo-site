@@ -9,7 +9,7 @@ export default class Photo {
     this.scroll = 0
 
     // Image Transform
-    const IMG_TRANSFORM = '?auto=format&w=2000'
+    const IMG_TRANSFORM = '?auto=format&w=1000'
 
     // Data
     this.data = data
@@ -106,6 +106,7 @@ export default class Photo {
     })
 
     this.mesh = new THREE.Mesh(this.geometry, this.material)
+    this.mesh.key = this.index
     this.mesh.frustumCulled = false
 
     this.resize()
@@ -126,6 +127,8 @@ export default class Photo {
       this.scale.x = b * this.metadata.dimensions.aspectRatio
       this.scale.y = b
     }
+
+    this.mesh.material.uniforms.scale.value = [this.scale.x, this.scale.y]
 
     this.mesh.scale.set(this.scale.x, this.scale.y, 1)
   }
