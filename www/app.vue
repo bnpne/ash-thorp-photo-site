@@ -4,7 +4,7 @@ import gsap from 'gsap'
 const { $load } = useNuxtApp()
 
 // Query Sanity
-const query = groq`*[_type=='main']{..., photos[]->{..., photo{..., asset->}}}`
+const query = groq`*[_type=='main']{..., photos[]->{..., photo{..., asset->}, audio{..., asset->}}}`
 const { data } = useSanityQuery(query)
 
 // Data Store

@@ -5,14 +5,26 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/sanity'],
   pages: true,
 
+  routeRules: {
+    '/': {prerender: true},
+    '/**': {prerender: true},
+  },
+
   sanity: {
     projectId: process.env.NUXT_SANITY_ID,
     dataset: 'production',
     useCdn: false,
     apiVersion: '2023-05-03',
   },
+
   build: {
     transpile: ['gsap', 'three'],
+  },
+
+  runtimeConfig: {
+    sanity: {
+      projectId: process.env.NUXT_SANITY_ID,
+    },
   },
 
   css: ['@/assets/styles/globals.scss'],

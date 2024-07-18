@@ -12,9 +12,9 @@ watch(() => dataStore.value, () => {
   }
 })
 
-
 onMounted(async () => {
   await nextTick()
+
   let p = gsap.utils.toArray('.p')
   if (p.length > 0) {
     let plt = gsap.utils.toArray('.pl-t span')
@@ -65,6 +65,7 @@ onMounted(async () => {
     margin: 0 calc((100vw / 12) + desktop-vw(20px));
     gap: calc(((100vw - (((100vw / 12) + desktop-vw(20px)) * 2) - desktop-vw(40px)) - (desktop-vw(150px) * 8)) / 7);
   }
+
 }
 
 .p {

@@ -20,6 +20,8 @@ export default class Photo {
     // Title
     this.title = data.title
 
+    this.slug = data?.slug
+
     // File Information
     this.file = {
       url: data.photo.asset.url + IMG_TRANSFORM,

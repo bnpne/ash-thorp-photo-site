@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import Sizes from './Sizes'
 import Photo from './Photo'
 
+import {useRouter} from 'vue-router'
+
 const CAMERA_POS_Z = 500
 
 export default class R {
@@ -14,6 +16,9 @@ export default class R {
     this.isRaycasting = false
     this.raycaster
     this.pointer
+    this.activePhoto = null
+
+    this.router = useRouter()
 
     this.init()
     this.listeners()
@@ -122,7 +127,21 @@ export default class R {
 
   handleClick() {
     if (this.isRaycasting && this.gridHoverIndex !== null) {
-      console.log(this.gridHoverIndex)
+      this.activePhoto = this.photoArray[this.gridHoverIndex]
+      let tl = toPhoto({
+        photos: this.photoArray,
+        target: this.gridHoverIndex,
+        camera: this.camera,
+      })
+      tl.play()
+
+      // if (this.photoArray[this.gridHoverIndex].slug !== undefined) {
+      //   this.router.push(
+      //     `/${this.photoArray[this.gridHoverIndex].slug.current}`,
+      //   )
+      // } else {
+      //   this.router.push(`/untitled-${this.gridHoverIndex}`)
+      // }
     }
   }
 
