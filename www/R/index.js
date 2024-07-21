@@ -3,6 +3,7 @@ import Sizes from './Sizes'
 import Photo from './Photo'
 
 import {useRouter} from 'vue-router'
+import {useNuxtApp} from '#app'
 
 const CAMERA_POS_Z = 500
 
@@ -17,8 +18,12 @@ export default class R {
     this.raycaster
     this.pointer
     this.activePhoto = null
+    this.toDetailTimeline = null
+    this.isDetail = false
 
     this.router = useRouter()
+
+    this.app = useNuxtApp()
 
     this.init()
     this.listeners()
@@ -75,13 +80,17 @@ export default class R {
   }
 
   loadElements(elements) {
-    this.elements = elements
+    return new Promise(resolve => {
+      this.elements = elements
 
-    if (this.photoArray.length === this.elements.length) {
-      this.photoArray.forEach((photo, i) => {
-        photo.addElement(this.elements[photo.index])
-      })
-    }
+      if (this.photoArray.length === this.elements.length) {
+        this.photoArray.forEach((photo, i) => {
+          photo.addElement(this.elements[photo.index])
+        })
+      }
+
+      resolve(this.photoArray)
+    })
   }
 
   /**
@@ -116,7 +125,7 @@ export default class R {
   }
 
   handleIntersecting(intersects) {
-    if (intersects[0]) {
+    if (intersects[0] && this.isDetail === false) {
       document.body.style.cursor = 'pointer'
       this.gridHoverIndex = intersects[0]?.object.key
     } else {
@@ -126,22 +135,44 @@ export default class R {
   }
 
   handleClick() {
-    if (this.isRaycasting && this.gridHoverIndex !== null) {
+    if (
+      this.isRaycasting &&
+      this.gridHoverIndex !== null &&
+      this.isDetail === false
+    ) {
       this.activePhoto = this.photoArray[this.gridHoverIndex]
-      let tl = toPhoto({
+      this.toDetailTimeline = toPhoto({
         photos: this.photoArray,
         target: this.gridHoverIndex,
         camera: this.camera,
       })
-      tl.play()
 
-      // if (this.photoArray[this.gridHoverIndex].slug !== undefined) {
-      //   this.router.push(
-      //     `/${this.photoArray[this.gridHoverIndex].slug.current}`,
-      //   )
-      // } else {
-      //   this.router.push(`/untitled-${this.gridHoverIndex}`)
-      // }
+      this.toDetailTimeline.eventCallback('onStart', () => {
+        this.app.$lenis.stop()
+        this.isDetail = true
+        document.body.style.cursor = 'auto'
+      })
+
+      this.toDetailTimeline.eventCallback('onComplete', () => {
+        this.router.push(`/${this.activePhoto.slug.current}`)
+      })
+
+      this.toDetailTimeline.eventCallback('onReverseComplete', () => {
+        // this.app.$lenis.start()
+        document.body.style.cursor = 'auto'
+      })
+
+      this.toDetailTimeline.play()
+    }
+  }
+
+  toHome() {
+    if (!this.toDetailTimeline.reversed()) {
+      this.toDetailTimeline.reverse().then(() => {
+        this.app.$lenis.start()
+
+        this.isDetail = false
+      })
     }
   }
 

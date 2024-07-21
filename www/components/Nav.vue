@@ -1,7 +1,17 @@
+<script setup>
+const router = useRouter()
+const app = useNuxtApp()
+
+const goHome = (e) => {
+  e.preventDefault()
+  router.back()
+}
+</script>
+
 <template>
   <nav class='n'>
     <div class='n-c'>
-      <NuxtLink to='/'>ASH THORP</NuxtLink>
+      <div @click='goHome' class='n-c-h'>ASH THORP</div>
     </div>
     <div class='n-c'>
       <NuxtLink to='/'>Info</NuxtLink>
@@ -26,6 +36,10 @@
     display: flex;
     flex-direction: row;
     gap: desktop-vw(100px);
+
+    &-h {
+      cursor: pointer;
+    }
   }
 }
 </style>

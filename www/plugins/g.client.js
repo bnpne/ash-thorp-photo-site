@@ -31,14 +31,20 @@ export default defineNuxtPlugin(app => {
     RInstance.stopEngine()
   }
 
-  const loadElements = elements => {
-    RInstance.loadElements(elements)
+  const loadElements = async elements => {
+    return new Promise(async resolve => {
+      await RInstance.loadElements(elements).then(photos => resolve(photos))
+    })
   }
 
   const handleScroll = () => {
     app.$lenis.on('scroll', ({scroll}) => {
       RInstance.updateScroll(scroll)
     })
+  }
+
+  const toHome = () => {
+    RInstance.toHome()
   }
 
   return {
@@ -48,6 +54,7 @@ export default defineNuxtPlugin(app => {
       loadElements,
       startEngine,
       stopEngine,
+      toHome,
     },
   }
 })
