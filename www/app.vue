@@ -26,13 +26,13 @@ onMounted(async () => {
     $loadElements(p).then((photos) => {
 
       let index
-      if (route.path !== '/' || route.path !== '/info') {
+      if (route.path !== '/' && route.path !== '/info') {
         photos.forEach((photo, i) => {
-          if (route.param.slug[0] === photo.slug.current) index = i
+          if (route.params.slug[0] === photo.slug.current) index = i
         })
+        $loadDetail(index)
       }
 
-      $loadDetail(index)
 
       // Play preloader
       let plt = gsap.utils.toArray('.pl-t span')
