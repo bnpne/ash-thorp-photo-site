@@ -54,15 +54,15 @@ export const toPhoto = ({photos, target, camera}) => {
         },
         '<',
       )
-      tl.to(
-        z,
-        {
-          z: -100,
-          ease: 'custom',
-          duration: 1.5,
-        },
-        '<',
-      )
+      // tl.to(
+      //   z,
+      //   {
+      //     z: -100,
+      //     ease: 'custom',
+      //     duration: 1.5,
+      //   },
+      //   '<',
+      // )
     }
   })
 

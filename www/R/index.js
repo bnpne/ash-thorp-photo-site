@@ -93,6 +93,28 @@ export default class R {
     })
   }
 
+  loadDetail(index) {
+    this.activePhoto = this.photoArray[index]
+    this.toDetailTimeline = toPhoto({
+      photos: this.photoArray,
+      target: index,
+      camera: this.camera,
+    })
+
+    this.toDetailTimeline.eventCallback('onStart', () => {
+      this.app.$lenis.stop()
+      this.isDetail = true
+      document.body.style.cursor = 'auto'
+    })
+
+    this.toDetailTimeline.eventCallback('onReverseComplete', () => {
+      // this.app.$lenis.start()
+      document.body.style.cursor = 'auto'
+    })
+
+    this.toDetailTimeline.play()
+  }
+
   /**
    * Load Photos
    */

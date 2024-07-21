@@ -1,7 +1,7 @@
 <script setup>
 import gsap from 'gsap'
 
-const { $load, $toHome, $loadElements } = useNuxtApp()
+const { $load, $toHome, $loadElements, $loadDetail } = useNuxtApp()
 const route = useRoute()
 const photos = ref(null)
 
@@ -13,7 +13,6 @@ const { data } = useSanityQuery(query)
 const dataStore = useData()
 
 onMounted(async () => {
-  window.addEventListener('popstate', () => console.log('pop'))
   if (data) {
     // Load GL
     dataStore.value = data.value[0]
@@ -25,6 +24,15 @@ onMounted(async () => {
     // Load Dom
     let p = gsap.utils.toArray('.p')
     $loadElements(p).then((photos) => {
+
+      let index
+      if (route.path !== '/' || route.path !== '/info') {
+        photos.forEach((photo, i) => {
+          if (route.param.slug[0] === photo.slug.current) index = i
+        })
+      }
+
+      $loadDetail(index)
 
       // Play preloader
       let plt = gsap.utils.toArray('.pl-t span')

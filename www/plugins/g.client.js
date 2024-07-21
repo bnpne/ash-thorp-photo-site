@@ -47,9 +47,14 @@ export default defineNuxtPlugin(app => {
     RInstance.toHome()
   }
 
+  const loadDetail = () => {
+    RInstance.loadDetail()
+  }
+
   return {
     provide: {
       setup,
+      loadDetail,
       load,
       loadElements,
       startEngine,
