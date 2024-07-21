@@ -41,7 +41,7 @@ onMounted(async () => {
       })
       tl.to(plt, {
         opacity: 1,
-        delay: 2.5,
+        delay: .5,
         stagger: {
           each: .3,
           from: 'edges',
