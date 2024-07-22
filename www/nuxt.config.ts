@@ -3,7 +3,7 @@ import glsl from 'vite-plugin-glsl'
 export default defineNuxtConfig({
   devtools: {enabled: false},
   modules: ['@nuxtjs/sanity'],
-  pages: true,
+  // pages: true,
 
   routeRules: {
     '/': {prerender: true},

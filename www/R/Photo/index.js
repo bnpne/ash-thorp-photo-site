@@ -117,23 +117,28 @@ export default class Photo {
 
   addElement(element) {
     this.element = element
+    this.setScale()
     this.setPosition()
   }
 
   setScale() {
-    let b = calcViewWidth(150, this.sizes)
+    // let b = calcViewWidth(150, this.sizes)
 
-    if (this.metadata.dimensions.aspectRatio >= 1) {
-      this.scale.x = b
-      this.scale.y = b / this.metadata.dimensions.aspectRatio
-    } else if (this.metadata.dimensions.aspectRatio < 1) {
-      this.scale.x = b * this.metadata.dimensions.aspectRatio
-      this.scale.y = b
+    if (this.element) {
+      let bounds = this.element.getBoundingClientRect()
+
+      if (this.metadata.dimensions.aspectRatio >= 1) {
+        this.scale.x = bounds.width
+        this.scale.y = bounds.width / this.metadata.dimensions.aspectRatio
+      } else if (this.metadata.dimensions.aspectRatio < 1) {
+        this.scale.x = bounds.height * this.metadata.dimensions.aspectRatio
+        this.scale.y = bounds.height
+      }
+
+      this.mesh.material.uniforms.scale.value = [this.scale.x, this.scale.y]
+
+      this.mesh.scale.set(this.scale.x, this.scale.y, 1)
     }
-
-    this.mesh.material.uniforms.scale.value = [this.scale.x, this.scale.y]
-
-    this.mesh.scale.set(this.scale.x, this.scale.y, 1)
   }
 
   setPosition() {

@@ -27,6 +27,7 @@ const data = ref(null)
 const isUntitled = ref(false)
 const audio = ref(null)
 const audioIsPlaying = ref(false)
+const { $toNextDetail } = useNuxtApp()
 
 watch(() => dataStore.value, () => {
   if (dataStore.value.photos) {
@@ -37,6 +38,14 @@ watch(() => dataStore.value, () => {
     })
   }
 })
+
+const handleNavLeft = () => {
+  $toNextDetail(-1)
+}
+
+const handleNavRight = () => {
+  $toNextDetail(1)
+}
 
 const triggerAudio = () => {
   if (audio.value !== null) {
@@ -81,6 +90,14 @@ onMounted(async () => {
 <template>
   <div id='page' class='d'>
     <div v-if='data' class='d-c'>
+      <div class='navigate'>
+        <div @click='handleNavLeft' class='navigate-l'>
+
+        </div>
+        <div @click='handleNavRight' class='navigate-r'>
+
+        </div>
+      </div>
       <div class='d-i'>
         <p class='d-i-t'>{{ data.title }}</p>
         <p @click='triggerAudio' class='d-i-a' v-if='data.audio'>
@@ -97,6 +114,30 @@ onMounted(async () => {
 </template>
 
 <style lang='scss'>
+.navigate {
+  display: flex;
+  position: fixed;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+  justify-content: space-between;
+
+  &-l,
+  &-r {
+    height: 100%;
+    width: 10%;
+  }
+
+  &-l {
+    cursor: w-resize;
+  }
+
+  &-r {
+    cursor: e-resize;
+  }
+
+}
+
 .d {
   height: 100%;
   width: 100%;
@@ -119,6 +160,7 @@ onMounted(async () => {
     left: 0;
     text-transform: uppercase;
     opacity: 0;
+    z-index: 4;
 
     &-t {
       flex: 0 0 calc((100% / 12) * 1 + desktop-vw(20px))

@@ -20,6 +20,7 @@ export default class R {
     this.activePhoto = null
     this.toDetailTimeline = null
     this.isDetail = false
+    this.inTransition = false
 
     this.router = useRouter()
 
@@ -115,6 +116,42 @@ export default class R {
     this.toDetailTimeline.play()
   }
 
+  toNextDetail(direction) {
+    let next
+    if (direction === 1) {
+      if (this.activePhoto.index === this.photoArray.length - 1) {
+        next = 0
+      } else {
+        next = this.activePhoto.index + 1
+      }
+    }
+    if (direction === -1) {
+      if (this.activePhoto.index === 0) {
+        next = this.photoArray.length - 1
+      } else {
+        next = this.activePhoto.index - 1
+      }
+    }
+
+    // this.activePhoto.mesh.material.uniforms.opacity.value = 0
+    // this.activePhoto = this.photoArray[next]
+    // this.activePhoto.mesh.material.uniforms.opacity.value = 1
+
+    let tl = toNextPhoto({
+      prev: this.activePhoto.index,
+      target: next,
+      camera: this.camera,
+      photos: this.photoArray,
+    })
+
+    this.activePhoto = this.photoArray[next]
+
+    tl.eventCallback('onStart', () => {
+      this.router.push(`/${this.activePhoto.slug.current}`)
+    })
+    tl.play()
+  }
+
   /**
    * Load Photos
    */
@@ -126,10 +163,12 @@ export default class R {
    * Handle Scroll
    */
   updateScroll(scroll) {
-    this.scroll = scroll
+    if (this.inTransition === false) {
+      this.scroll = scroll
 
-    if (this.photoArray.length > 0) {
-      this.photoArray.forEach(photo => photo.updateScroll(this.scroll))
+      if (this.photoArray.length > 0) {
+        this.photoArray.forEach(photo => photo.updateScroll(this.scroll))
+      }
     }
   }
 
@@ -172,6 +211,7 @@ export default class R {
       this.toDetailTimeline.eventCallback('onStart', () => {
         this.app.$lenis.stop()
         this.isDetail = true
+        this.inTransition = true
         document.body.style.cursor = 'auto'
       })
 
@@ -184,16 +224,24 @@ export default class R {
         document.body.style.cursor = 'auto'
       })
 
+      this.scrollMemory = this.app.$lenis.scroll
       this.toDetailTimeline.play()
+      // console.log(this.app.$lenis.scroll)
     }
   }
 
   toHome() {
     if (!this.toDetailTimeline.reversed()) {
       this.toDetailTimeline.reverse().then(() => {
-        this.app.$lenis.start()
-
+        this.inTransition = false
         this.isDetail = false
+
+        this.app.$lenis.scrollTo(this.scrollMemory, {
+          immediate: true,
+          force: true,
+          lock: true,
+        })
+        this.app.$lenis.start()
       })
     }
   }

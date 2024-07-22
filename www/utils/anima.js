@@ -88,3 +88,69 @@ export const toPhoto = ({photos, target, camera}) => {
 
   return tl
 }
+
+export const toNextPhoto = ({prev, target, camera, photos}) => {
+  let tl = gsap.timeline({
+    paused: true,
+    ease: 'custom',
+    onUpdate: () => {},
+  })
+
+  let targetPhoto = photos[prev]
+
+  let targetPosition = new THREE.Vector3()
+  targetPhoto.mesh.getWorldPosition(targetPosition)
+
+  let nextPhoto = photos[target]
+  let nextPosition = new THREE.Vector3()
+  nextPhoto.mesh.getWorldPosition(nextPosition)
+
+  // Calculate the offset to move to the next photo
+  let offset = new THREE.Vector3().subVectors(nextPosition, targetPosition)
+
+  // Calculate the new camera position by adding the offset
+  let newCameraPosition = new THREE.Vector3().addVectors(
+    camera.position,
+    offset,
+  )
+
+  tl.to(
+    camera.position,
+    {
+      x: newCameraPosition.x,
+      y: newCameraPosition.y,
+      duration: 1,
+      ease: 'custom',
+    },
+    '<',
+  )
+
+  photos.forEach((photo, i) => {
+    if (i === prev) {
+      let o = photo.mesh.material.uniforms.opacity
+      tl.to(
+        o,
+        {
+          value: 0,
+          ease: 'custom',
+          duration: 1,
+        },
+        '<',
+      )
+    }
+    if (i === target) {
+      let o = photo.mesh.material.uniforms.opacity
+      tl.to(
+        o,
+        {
+          value: 1,
+          ease: 'custom',
+          duration: 1,
+        },
+        '<',
+      )
+    }
+  })
+
+  return tl
+}

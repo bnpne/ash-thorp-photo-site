@@ -3,6 +3,7 @@ import gsap from 'gsap'
 
 const { $load, $toHome, $loadElements, $loadDetail } = useNuxtApp()
 const route = useRoute()
+const router = useRouter()
 const photos = ref(null)
 
 // Query Sanity
@@ -12,7 +13,14 @@ const { data } = useSanityQuery(query)
 // Data Store
 const dataStore = useData()
 
+
 onMounted(async () => {
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      router.push('/')
+    }
+  })
+
   if (data) {
     // Load GL
     dataStore.value = data.value[0]
@@ -23,16 +31,26 @@ onMounted(async () => {
     await nextTick()
     // Load Dom
     let p = gsap.utils.toArray('.p')
-    $loadElements(p).then((photos) => {
+    $loadElements(p).then(async (photos) => {
 
       let index
       if (route.path !== '/' && route.path !== '/info') {
         photos.forEach((photo, i) => {
-          if (route.params.slug[0] === photo.slug.current) index = i
+          if (route.params.slug[0] === photo.slug.current) {
+            index = i
+          }
         })
-        $loadDetail(index)
+        if (index !== undefined) {
+          // set each photo to opacity 1
+          photos.forEach(photo => {
+            photo.mesh.material.uniforms.opacity.value = 1
+          })
+
+          $loadDetail(index)
+        }
       }
 
+      await nextTick()
 
       // Play preloader
       let plt = gsap.utils.toArray('.pl-t span')
@@ -56,24 +74,39 @@ onMounted(async () => {
       photos.forEach((photo, i) => {
         let anima = photo.mesh.material.uniforms.opacity
         let pos = photo.mesh.position
-        tl.from(
-          pos,
-          {
-            y: photo.mesh.position.y - 150,
-            ease: 'easeOutQuint',
-            duration: 1,
-          },
-          i === 0 ? '>' : '<+=.009'
-        )
-        tl.to(
-          anima,
-          {
-            value: 1,
-            duration: 1,
-            ease: 'easeOutQuint',
-          },
-          '<'
-        )
+
+        if (route.path === '/') {
+          tl.from(
+            pos,
+            {
+              y: photo.mesh.position.y - 150,
+              ease: 'easeOutQuint',
+              duration: 1,
+            },
+            i === 0 ? '>' : '<+=.009'
+          )
+          tl.to(
+            anima,
+            {
+              value: 1,
+              duration: 1,
+              ease: 'easeOutQuint',
+            },
+            '<'
+          )
+        } else {
+          if (i === index) {
+            tl.from(
+              anima,
+              {
+                value: 0,
+                duration: 1,
+                ease: 'easeOutQuint',
+              },
+              '>'
+            )
+          }
+        }
       })
 
       tl.play()
@@ -116,7 +149,6 @@ onMounted(async () => {
   }
 
 }
-
 
 .p {
   display: block;

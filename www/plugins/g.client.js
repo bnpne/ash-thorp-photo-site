@@ -47,14 +47,20 @@ export default defineNuxtPlugin(app => {
     RInstance.toHome()
   }
 
-  const loadDetail = () => {
-    RInstance.loadDetail()
+  const loadDetail = index => {
+    RInstance.loadDetail(index)
+  }
+
+  const toNextDetail = direction => {
+    // -1 left, 1 right
+    RInstance.toNextDetail(direction)
   }
 
   return {
     provide: {
       setup,
       loadDetail,
+      toNextDetail,
       load,
       loadElements,
       startEngine,

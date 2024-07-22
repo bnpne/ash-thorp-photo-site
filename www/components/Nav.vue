@@ -11,7 +11,8 @@ const goHome = (e) => {
 <template>
   <nav class='n'>
     <div class='n-c'>
-      <div @click='goHome' class='n-c-h'>ASH THORP</div>
+      <!-- <div @click='goHome' class='n-c-h'>ASH THORP</div> -->
+      <NuxtLink to='/' class='n-c-h'>ASH THORP</NuxtLink>
     </div>
     <div class='n-c'>
       <NuxtLink to='/'>Info</NuxtLink>

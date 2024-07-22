@@ -7,7 +7,7 @@ definePageMeta({
     name: 'photo',
     mode: 'out-in',
     onEnter(el, done) {
-      const { $toHome } = useNuxtApp()
+      const { $toHome, $lenis } = useNuxtApp()
       $toHome()
       done()
     },

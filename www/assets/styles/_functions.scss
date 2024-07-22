@@ -72,13 +72,13 @@
   font-family: 'IBM Plex Mono', monospace;
   font-weight: 400;
   font-style: normal;
-  font-size: 10px;
-  line-height: 11px;
+  font-size: 12px;
+  line-height: 13px;
   text-transform: uppercase;
 
   @media (min-width: 2800px) {
     font-size: 1vw;
-    line-height: 1.4vw;
+    line-height: 1.1vw;
   }
 
   @media (max-width: 1000px) {
