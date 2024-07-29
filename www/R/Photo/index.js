@@ -9,7 +9,7 @@ export default class Photo {
     this.scroll = 0
 
     // Image Transform
-    const IMG_TRANSFORM = '?auto=format&w=1000'
+    const IMG_TRANSFORM = '?auto=format&w=300'
 
     // Data
     this.data = data

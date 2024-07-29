@@ -83,12 +83,12 @@ onMounted(async () => {
               ease: 'easeOutQuint',
               duration: 1,
             },
-            i === 0 ? '>' : '<+=.009'
+            '<+=.009'
           )
-          tl.to(
+          tl.from(
             anima,
             {
-              value: 1,
+              value: 0,
               duration: 1,
               ease: 'easeOutQuint',
             },
