@@ -6,8 +6,8 @@ export default defineNuxtConfig({
   pages: true,
 
   routeRules: {
-    // '/': {prerender: true},
-    // '/**': {prerender: true},
+    '/': {prerender: true},
+    '/**': {prerender: true},
   },
 
   sanity: {

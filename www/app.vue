@@ -5,6 +5,9 @@ const { $lenis, $load, $toHome, $loadElements, $loadDetail } = useNuxtApp()
 const route = useRoute()
 const router = useRouter()
 const photos = ref(null)
+const activePhoto = ref(null)
+const activeIndex = ref(null)
+const photoArray = ref(null)
 
 // Query Sanity
 const query = groq`*[_type=='main']{..., photos[]->{..., photo{..., asset->}, audio{..., asset->}}}`
@@ -13,11 +16,53 @@ const { data } = useSanityQuery(query)
 // Data Store
 const dataStore = useData()
 
+watch(() => route.params.slug, () => {
+  if (route.params.slug !== undefined && route.params.slug !== null) {
+    photoArray.value.forEach((photo, i) => {
+      if (route.params.slug === photo.slug.current) {
+        activeIndex.value = i
+        activePhoto.value = photo
+      }
+    })
+  }
+})
 
 onMounted(async () => {
-  window.addEventListener('keydown', (e) => {
+  window.addEventListener('keydown', async (e) => {
     if (e.key === 'Escape') {
       router.push('/')
+    }
+    if (e.key === 'ArrowLeft') {
+      if (activeIndex.value !== null) {
+        // -1
+
+        let prevIndex
+        if (activeIndex.value === 0) {
+          prevIndex = dataStore.value.photos.length - 1
+        } else {
+          prevIndex = activeIndex.value - 1
+        }
+
+        if (prevIndex !== undefined) {
+          await navigateTo(`/${dataStore.value.photos[prevIndex].slug?.current}`)
+        }
+      }
+    }
+    if (e.key === 'ArrowRight') {
+      if (activeIndex.value !== null) {
+        // 1
+
+        let nextIndex
+        if (activeIndex.value === dataStore.value.photos.length - 1) {
+          nextIndex = 0
+        } else {
+          nextIndex = activeIndex.value + 1
+        }
+
+        if (nextIndex !== undefined) {
+          await navigateTo(`/${dataStore.value.photos[nextIndex].slug?.current}`)
+        }
+      }
     }
   })
 
@@ -33,12 +78,15 @@ onMounted(async () => {
     let p = gsap.utils.toArray('.p')
     $loadElements(p).then(async (photos) => {
 
+      photoArray.value = photos
       await nextTick()
       let index
       if (route.path !== '/' && route.path !== '/info') {
         photos.forEach((photo, i) => {
-          if (route.params.slug[0] === photo.slug.current) {
+          if (route.params.slug === photo.slug.current) {
             index = i
+            activeIndex.value = i
+            activePhoto.value = photo
           }
         })
         if (index !== undefined) {
@@ -48,8 +96,10 @@ onMounted(async () => {
               $loadDetail(index)
           })
         }
+      } else {
+        activePhoto.value = null
+        activeIndex.value = null
       }
-
 
       await nextTick()
       // Play preloader

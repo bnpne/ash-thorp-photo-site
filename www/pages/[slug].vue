@@ -1,12 +1,15 @@
 <script setup>
 import gsap from 'gsap'
 import { format } from 'date-fns'
-
-let ifDoWait = false
 definePageMeta({
   middleware: [
     function (to, from) {
-      doWait(from.path)
+      const waiting = useWaiting()
+      if (from.path === '/') {
+        waiting.value = true
+      } else {
+        waiting.value = false
+      }
     }
   ],
   pageTransition: {
@@ -50,7 +53,7 @@ const gradient = reactive({ lightVibrant: null, darkVibrant: null })
 const gradientElement = ref(null)
 const metadataActive = ref(false)
 const metadata = ref(null)
-const waiting = doWait()
+const waiting = useWaiting()
 
 watch(() => dataStore.value, () => {
   if (dataStore.value.photos) {
@@ -72,7 +75,6 @@ const handleNavLeft = async () => {
     prevIndex = index.value - 1
   }
 
-  // console.log(dataStore.value.photos[prevIndex].slug?.current)
   if (prevIndex !== undefined) {
     await navigateTo(`/${dataStore.value.photos[prevIndex].slug?.current}`)
   }
@@ -88,8 +90,6 @@ const handleNavRight = async () => {
     nextIndex = index.value + 1
   }
 
-
-  // console.log(dataStore.value.photos[nextIndex].slug?.current)
   if (nextIndex !== undefined) {
     await navigateTo(`/${dataStore.value.photos[nextIndex].slug?.current}`)
   }
@@ -142,7 +142,7 @@ const decimalToFraction = (decimal) => {
 }
 
 onMounted(async () => {
-  slug.value = route.params.slug[0]
+  slug.value = route.params.slug
 
   if (dataStore.value) {
     dataStore.value.photos.forEach((photo, i) => {
@@ -152,6 +152,7 @@ onMounted(async () => {
       }
     })
   }
+
 
   await nextTick()
 
@@ -238,13 +239,12 @@ onMounted(async () => {
     ss.value = fraction
   }
 
-  console.log(waiting.value)
   // intro animation
   let intro = gsap.timeline({ paused: true })
   intro.to('.d-i', {
     opacity: 1,
     duration: 1,
-    delay: ifDoWait ? 1 : 0,
+    delay: waiting.value ? 1 : 0,
     ease: 'easeOutQuint',
   }, '<')
     .from('.d-container', {
@@ -437,6 +437,7 @@ onBeforeUnmount(() => {
       justify-content: center;
       align-items: center;
       position: relative;
+      overflow: hidden;
 
       &.active {
         display: flex;

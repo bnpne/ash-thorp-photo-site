@@ -23,7 +23,6 @@ export default defineNuxtPlugin(app => {
   gsap.ticker.lagSmoothing(0)
 
   // lenis.on('scroll', e => {
-  //   console.log(e.scroll)
   // })
 
   return {
