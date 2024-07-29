@@ -2,7 +2,13 @@
 import gsap from 'gsap'
 import { format } from 'date-fns'
 
+let ifDoWait = false
 definePageMeta({
+  middleware: [
+    function (to, from) {
+      doWait(from.path)
+    }
+  ],
   pageTransition: {
     css: false,
     name: 'detail',
@@ -44,6 +50,7 @@ const gradient = reactive({ lightVibrant: null, darkVibrant: null })
 const gradientElement = ref(null)
 const metadataActive = ref(false)
 const metadata = ref(null)
+const waiting = doWait()
 
 watch(() => dataStore.value, () => {
   if (dataStore.value.photos) {
@@ -231,11 +238,13 @@ onMounted(async () => {
     ss.value = fraction
   }
 
+  console.log(waiting.value)
   // intro animation
   let intro = gsap.timeline({ paused: true })
   intro.to('.d-i', {
     opacity: 1,
     duration: 1,
+    delay: ifDoWait ? 1 : 0,
     ease: 'easeOutQuint',
   }, '<')
     .from('.d-container', {

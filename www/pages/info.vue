@@ -4,17 +4,16 @@ import gsap from 'gsap'
 definePageMeta({
   pageTransition: {
     css: false,
-    name: 'photo',
+    name: 'info',
     mode: 'out-in',
     onEnter(el, done) {
-      const { $toHome } = useNuxtApp()
-      $toHome()
+      // const { $ } = useNuxtApp()
+      // $toDetail()
       done()
     },
     onLeave(el, done) {
-      const route = useRoute()
-      const { $toDetail } = useNuxtApp()
-      $toDetail()
+      const { $toHome } = useNuxtApp()
+      $toHome()
       done()
     },
   },

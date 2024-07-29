@@ -15,7 +15,7 @@ const goHome = (e) => {
       <NuxtLink to='/' class='n-c-h'>ASH THORP</NuxtLink>
     </div>
     <div class='n-c'>
-      <NuxtLink to='/'>Info</NuxtLink>
+      <NuxtLink to='/info'>Info</NuxtLink>
       <NuxtLink to='/'>Email</NuxtLink>
     </div>
   </nav>
