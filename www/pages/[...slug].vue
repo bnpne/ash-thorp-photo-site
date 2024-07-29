@@ -65,6 +65,7 @@ const handleNavLeft = async () => {
     prevIndex = index.value - 1
   }
 
+  // console.log(dataStore.value.photos[prevIndex].slug?.current)
   if (prevIndex !== undefined) {
     await navigateTo(`/${dataStore.value.photos[prevIndex].slug?.current}`)
   }
@@ -81,6 +82,7 @@ const handleNavRight = async () => {
   }
 
 
+  // console.log(dataStore.value.photos[nextIndex].slug?.current)
   if (nextIndex !== undefined) {
     await navigateTo(`/${dataStore.value.photos[nextIndex].slug?.current}`)
   }

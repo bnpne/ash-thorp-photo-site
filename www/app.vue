@@ -94,16 +94,6 @@ onMounted(async () => {
             },
             '<'
           )
-        } else {
-          tl.to(
-            anima,
-            {
-              value: 0,
-              duration: 1,
-              ease: 'easeOutQuint',
-            },
-            '>'
-          )
         }
       })
 
