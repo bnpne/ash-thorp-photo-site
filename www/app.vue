@@ -1,7 +1,7 @@
 <script setup>
 import gsap from 'gsap'
 
-const { $load, $toHome, $loadElements, $loadDetail } = useNuxtApp()
+const { $lenis, $load, $toHome, $loadElements, $loadDetail } = useNuxtApp()
 const route = useRoute()
 const router = useRouter()
 const photos = ref(null)
@@ -33,6 +33,7 @@ onMounted(async () => {
     let p = gsap.utils.toArray('.p')
     $loadElements(p).then(async (photos) => {
 
+      await nextTick()
       let index
       if (route.path !== '/' && route.path !== '/info') {
         photos.forEach((photo, i) => {
@@ -41,17 +42,16 @@ onMounted(async () => {
           }
         })
         if (index !== undefined) {
-          // set each photo to opacity 1
-          photos.forEach(photo => {
-            photo.mesh.material.uniforms.opacity.value = 1
+          let scrollBounds = photos[index].element.getBoundingClientRect()
+          $lenis.scrollTo(scrollBounds.top - window.innerHeight, {
+            immediate: true, force: true, lock: true, onComplete:
+              $loadDetail(index)
           })
-
-          $loadDetail(index)
         }
       }
 
-      await nextTick()
 
+      await nextTick()
       // Play preloader
       let plt = gsap.utils.toArray('.pl-t span')
       let tl = gsap.timeline({
@@ -95,17 +95,15 @@ onMounted(async () => {
             '<'
           )
         } else {
-          if (i === index) {
-            tl.from(
-              anima,
-              {
-                value: 0,
-                duration: 1,
-                ease: 'easeOutQuint',
-              },
-              '>'
-            )
-          }
+          tl.to(
+            anima,
+            {
+              value: 0,
+              duration: 1,
+              ease: 'easeOutQuint',
+            },
+            '>'
+          )
         }
       })
 
@@ -122,7 +120,7 @@ onMounted(async () => {
     <NuxtPage />
     <div class='h'>
       <div v-if='photos' class='h-c'>
-        <div v-for='photo in photos' class='p'></div>
+        <NuxtLink v-for='photo in photos' :to='`/${photo.slug.current}`' class='p'></NuxtLink>
       </div>
     </div>
     <Canvas />

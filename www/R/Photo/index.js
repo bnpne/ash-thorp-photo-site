@@ -9,7 +9,7 @@ export default class Photo {
     this.scroll = 0
 
     // Image Transform
-    const IMG_TRANSFORM = '?auto=format&w=1500'
+    const IMG_TRANSFORM = '?auto=format&w=1000'
 
     // Data
     this.data = data
@@ -105,7 +105,7 @@ export default class Photo {
         this.metadata.dimensions.width,
         this.metadata.dimensions.height,
       ],
-      opacity: 0,
+      opacity: 1,
     })
 
     this.mesh = new THREE.Mesh(this.geometry, this.material)

@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@nuxtjs/sanity": "^1.11.4",
+    "blurhash": "^2.0.5",
+    "date-fns": "^3.6.0",
     "gsap": "^3.12.5",
     "lenis": "^1.1.6",
     "lil-gui": "^0.19.2",

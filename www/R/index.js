@@ -1,9 +1,12 @@
 import * as THREE from 'three'
 import Sizes from './Sizes'
 import Photo from './Photo'
+import gsap from 'gsap'
 
 import {useRouter} from 'vue-router'
 import {useNuxtApp} from '#app'
+
+import {toDetailAnima, toHomeAnima} from '~/utils/anima'
 
 const CAMERA_POS_Z = 500
 
@@ -14,13 +17,12 @@ export default class R {
     this.photoArray = []
     this.elements = []
     this.scroll = 0
-    this.isRaycasting = false
-    this.raycaster
-    this.pointer
     this.activePhoto = null
-    this.toDetailTimeline = null
     this.isDetail = false
     this.inTransition = false
+    this.toDetailTl = null
+    this.toHomeTl = null
+    this.scrollMemory
 
     this.router = useRouter()
 
@@ -56,10 +58,6 @@ export default class R {
 
     this.scene.add(this.camera)
 
-    this.createPositions()
-
-    this.initRaycaster()
-
     this.resize()
   }
 
@@ -94,71 +92,6 @@ export default class R {
     })
   }
 
-  loadDetail(index) {
-    this.activePhoto = this.photoArray[index]
-    this.toDetailTimeline = toPhoto({
-      photos: this.photoArray,
-      target: index,
-      camera: this.camera,
-    })
-
-    this.toDetailTimeline.eventCallback('onStart', () => {
-      this.app.$lenis.stop()
-      this.isDetail = true
-      document.body.style.cursor = 'auto'
-    })
-
-    this.toDetailTimeline.eventCallback('onReverseComplete', () => {
-      // this.app.$lenis.start()
-      document.body.style.cursor = 'auto'
-    })
-
-    this.toDetailTimeline.play()
-  }
-
-  toNextDetail(direction) {
-    let next
-    if (direction === 1) {
-      if (this.activePhoto.index === this.photoArray.length - 1) {
-        next = 0
-      } else {
-        next = this.activePhoto.index + 1
-      }
-    }
-    if (direction === -1) {
-      if (this.activePhoto.index === 0) {
-        next = this.photoArray.length - 1
-      } else {
-        next = this.activePhoto.index - 1
-      }
-    }
-
-    // this.activePhoto.mesh.material.uniforms.opacity.value = 0
-    // this.activePhoto = this.photoArray[next]
-    // this.activePhoto.mesh.material.uniforms.opacity.value = 1
-
-    let tl = toNextPhoto({
-      prev: this.activePhoto.index,
-      target: next,
-      camera: this.camera,
-      photos: this.photoArray,
-    })
-
-    this.activePhoto = this.photoArray[next]
-
-    tl.eventCallback('onStart', () => {
-      this.router.push(`/${this.activePhoto.slug.current}`)
-    })
-    tl.play()
-  }
-
-  /**
-   * Load Photos
-   */
-  createPositions() {
-    // initial grid
-  }
-
   /**
    * Handle Scroll
    */
@@ -173,77 +106,46 @@ export default class R {
   }
 
   /**
-   * Raycaster
+   * Animations
    */
-  initRaycaster() {
-    this.raycaster = new THREE.Raycaster()
-    this.pointer = new THREE.Vector2()
-  }
-
-  pointerMove(e) {
-    this.pointer.x = (e.clientX / this.sizes.width) * 2 - 1
-    this.pointer.y = -(e.clientY / this.sizes.height) * 2 + 1
-  }
-
-  handleIntersecting(intersects) {
-    if (intersects[0] && this.isDetail === false) {
-      document.body.style.cursor = 'pointer'
-      this.gridHoverIndex = intersects[0]?.object.key
-    } else {
-      document.body.style.cursor = 'auto'
-      this.gridHoverIndex = null
-    }
-  }
-
-  handleClick() {
-    if (
-      this.isRaycasting &&
-      this.gridHoverIndex !== null &&
-      this.isDetail === false
-    ) {
-      this.activePhoto = this.photoArray[this.gridHoverIndex]
-      this.toDetailTimeline = toPhoto({
-        photos: this.photoArray,
-        target: this.gridHoverIndex,
-        camera: this.camera,
-      })
-
-      this.toDetailTimeline.eventCallback('onStart', () => {
-        this.app.$lenis.stop()
-        this.isDetail = true
-        this.inTransition = true
-        document.body.style.cursor = 'auto'
-      })
-
-      this.toDetailTimeline.eventCallback('onComplete', () => {
-        this.router.push(`/${this.activePhoto.slug.current}`)
-      })
-
-      this.toDetailTimeline.eventCallback('onReverseComplete', () => {
-        // this.app.$lenis.start()
-        document.body.style.cursor = 'auto'
-      })
-
-      this.scrollMemory = this.app.$lenis.scroll
-      this.toDetailTimeline.play()
-      // console.log(this.app.$lenis.scroll)
-    }
-  }
-
   toHome() {
-    if (!this.toDetailTimeline.reversed()) {
-      this.toDetailTimeline.reverse().then(() => {
-        this.inTransition = false
-        this.isDetail = false
-
-        this.app.$lenis.scrollTo(this.scrollMemory, {
-          immediate: true,
-          force: true,
-          lock: true,
-        })
-        this.app.$lenis.start()
+    this.toHomeTl = toHomeAnima({photos: this.photoArray})
+    this.toHomeTl.eventCallback('onComplete', () => {
+      this.isDetail = false
+      this.inTransition = false
+      this.app.$lenis.scrollTo(this.scrollMemory, {
+        immediate: true,
+        force: true,
+        lock: true,
       })
-    }
+      this.app.$lenis.start()
+    })
+
+    this.toHomeTl.play()
+  }
+
+  toDetail() {
+    this.scrollMemory = this.app.$lenis.scroll
+    this.toDetailTl = toDetailAnima({photos: this.photoArray})
+    this.toDetailTl.eventCallback('onStart', () => {
+      this.isDetail = true
+      this.inTransition = true
+      this.app.$lenis.stop()
+    })
+
+    this.toDetailTl.play()
+  }
+
+  loadDetail() {
+    this.scrollMemory = this.app.$lenis.scroll
+    this.toDetailTl = toDetailAnima({photos: this.photoArray})
+    this.toDetailTl.eventCallback('onStart', () => {
+      this.isDetail = true
+      this.inTransition = true
+      this.app.$lenis.stop()
+    })
+
+    this.toDetailTl.play()
   }
 
   /**
@@ -266,8 +168,6 @@ export default class R {
    */
   listeners() {
     window.addEventListener('resize', this.resize.bind(this))
-    window.addEventListener('pointermove', this.pointerMove.bind(this))
-    window.addEventListener('click', this.handleClick.bind(this))
   }
 
   /**
@@ -283,16 +183,6 @@ export default class R {
 
   raf = () => {
     this.renderer.render(this.scene, this.camera)
-
-    if (this.raycaster) {
-      this.isRaycasting = true
-      this.raycaster.setFromCamera(this.pointer, this.camera)
-
-      // calculate objects intersecting the picking ray
-      this.intersects = this.raycaster.intersectObjects(this.scene.children)
-
-      this.handleIntersecting(this.intersects)
-    }
 
     requestAnimationFrame(this.raf)
   }
