@@ -1,11 +1,6 @@
 <script setup>
 const router = useRouter()
 const app = useNuxtApp()
-
-const goHome = (e) => {
-  e.preventDefault()
-  router.back()
-}
 </script>
 
 <template>
@@ -16,7 +11,7 @@ const goHome = (e) => {
     </div>
     <div class='n-c'>
       <NuxtLink to='/info'>Info</NuxtLink>
-      <NuxtLink to='/'>Email</NuxtLink>
+      <NuxtLink to='mailto:ash@altcinc.com' target='blank' ref='noreferrer'>Email</NuxtLink>
     </div>
   </nav>
 </template>
@@ -33,10 +28,18 @@ const goHome = (e) => {
   padding: desktop-vw(20px);
   width: 100%;
 
+  @include mobile() {
+    padding: mobile-vw(10px);
+  }
+
   &-c {
     display: flex;
     flex-direction: row;
     gap: desktop-vw(100px);
+
+    @include mobile() {
+      gap: mobile-vw(50px);
+    }
 
     &-h {
       cursor: pointer;

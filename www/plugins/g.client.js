@@ -51,6 +51,10 @@ export default defineNuxtPlugin(app => {
     RInstance.toDetail()
   }
 
+  const toInfo = () => {
+    RInstance.toInfo()
+  }
+
   const loadDetail = index => {
     RInstance.loadDetail(index)
   }
@@ -70,6 +74,7 @@ export default defineNuxtPlugin(app => {
       startEngine,
       stopEngine,
       toHome,
+      toInfo,
       toDetail,
     },
   }

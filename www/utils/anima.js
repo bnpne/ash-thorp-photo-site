@@ -52,31 +52,32 @@ export const toHomeAnima = ({photos}) => {
   return tl
 }
 
-export const toDetailAnima = ({photos}) => {
+export const toDetailAnima = ({photos, info}) => {
   let tl = gsap.timeline({
     paused: true,
   })
 
-  tl.to(
-    [document.body],
-    {
-      background: '#000000',
-      duration: 1,
-      color: '#ffffff',
-      ease: 'custom',
-    },
-    '<',
-  )
-  tl.to(
-    ['.n'],
-    {
-      duration: 1,
-      color: '#ffffff',
-      ease: 'custom',
-    },
-    '<',
-  )
-
+  if (info === false) {
+    tl.to(
+      [document.body],
+      {
+        background: '#000000',
+        duration: 1,
+        color: '#ffffff',
+        ease: 'custom',
+      },
+      '<',
+    )
+    tl.to(
+      ['.n'],
+      {
+        duration: 1,
+        color: '#ffffff',
+        ease: 'custom',
+      },
+      '<',
+    )
+  }
   photos.forEach((photo, i) => {
     let anima = photo.mesh.material.uniforms.opacity
     let pos = photo.mesh.position

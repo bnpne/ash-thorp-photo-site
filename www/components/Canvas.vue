@@ -1,11 +1,14 @@
 <script setup>
 const canvas = ref()
 const app = useNuxtApp()
+const { isMobile } = useDevice();
 
 onMounted(() => {
-  if (canvas.value) {
-    // Initialize WebGL
-    app.$setup(canvas.value)
+  if (!isMobile) {
+    if (canvas.value) {
+      // Initialize WebGL
+      app.$setup(canvas.value)
+    }
   }
 })
 </script>

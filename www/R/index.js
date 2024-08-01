@@ -96,7 +96,7 @@ export default class R {
    * Handle Scroll
    */
   updateScroll(scroll) {
-    if (this.inTransition === false) {
+    if (this.inTransition === false && this.isDetail === false) {
       this.scroll = scroll
 
       if (this.photoArray.length > 0) {
@@ -126,7 +126,8 @@ export default class R {
 
   toDetail() {
     this.scrollMemory = this.app.$lenis.scroll
-    this.toDetailTl = toDetailAnima({photos: this.photoArray})
+    let isInfo = false
+    this.toDetailTl = toDetailAnima({photos: this.photoArray, info: isInfo})
     this.toDetailTl.eventCallback('onStart', () => {
       this.isDetail = true
       this.inTransition = true
@@ -138,7 +139,21 @@ export default class R {
 
   loadDetail() {
     this.scrollMemory = this.app.$lenis.scroll
-    this.toDetailTl = toDetailAnima({photos: this.photoArray})
+    let isInfo = false
+    this.toDetailTl = toDetailAnima({photos: this.photoArray, info: isInfo})
+    this.toDetailTl.eventCallback('onStart', () => {
+      this.isDetail = true
+      this.inTransition = true
+      this.app.$lenis.stop()
+    })
+
+    this.toDetailTl.play()
+  }
+
+  toInfo() {
+    this.scrollMemory = this.app.$lenis.scroll
+    let isInfo = true
+    this.toDetailTl = toDetailAnima({photos: this.photoArray, info: isInfo})
     this.toDetailTl.eventCallback('onStart', () => {
       this.isDetail = true
       this.inTransition = true

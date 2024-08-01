@@ -23,13 +23,12 @@ definePageMeta({
       let intro = gsap.timeline({ paused: true, onComplete: () => done() })
       intro.to('.d-i', {
         opacity: 0,
-        duration: 1,
+        duration: .6,
         ease: 'easeOutQuint',
       }, '<')
         .to('.d-container-im', {
           opacity: 0,
-          duration: 1,
-          // y: '-10%',
+          duration: .6,
           ease: 'easeOutQuint',
         }, '<')
 
@@ -56,18 +55,11 @@ const metadata = ref(null)
 const waiting = useWaiting()
 
 watch(() => dataStore.value, () => {
-  if (dataStore.value.photos) {
-    dataStore.value.photos.forEach(photo => {
-      if (photo.slug && photo.slug.current === slug.value) {
-        data.value = photo
-      }
-    })
-  }
+  setImages()
 })
 
 const handleNavLeft = async () => {
   // -1
-
   let prevIndex
   if (index.value === 0) {
     prevIndex = dataStore.value.photos.length - 1
@@ -82,7 +74,6 @@ const handleNavLeft = async () => {
 
 const handleNavRight = async () => {
   // 1
-
   let nextIndex
   if (index.value === dataStore.value.photos.length - 1) {
     nextIndex = 0
@@ -141,9 +132,7 @@ const decimalToFraction = (decimal) => {
   return `${h1}/${k1}`;
 }
 
-onMounted(async () => {
-  slug.value = route.params.slug
-
+const setImages = () => {
   if (dataStore.value) {
     dataStore.value.photos.forEach((photo, i) => {
       if (photo.slug && photo.slug.current === slug.value) {
@@ -152,7 +141,12 @@ onMounted(async () => {
       }
     })
   }
+}
 
+onMounted(async () => {
+  slug.value = route.params.slug
+
+  setImages()
 
   await nextTick()
 
@@ -243,14 +237,13 @@ onMounted(async () => {
   let intro = gsap.timeline({ paused: true })
   intro.to('.d-i', {
     opacity: 1,
-    duration: 1,
-    delay: waiting.value ? 1 : 0,
+    duration: waiting.value ? 1 : .6,
+    delay: waiting.value ? 1.2 : 0,
     ease: 'easeOutQuint',
   }, '<')
     .from('.d-container', {
       opacity: 0,
-      // y: '10%',
-      duration: 1,
+      duration: waiting.value ? 1 : .6,
       ease: 'easeOutQuint',
     }, '<')
 
@@ -293,7 +286,6 @@ onBeforeUnmount(() => {
             :style="{ 'aspect-ratio': data.photo.asset.metadata.dimensions.aspectRatio }">
             <div class='d-container-im-m' v-if='metadata'>
               <ul class='d-container-im-m-l'>
-                <!-- <li v-for='(item, key) in metadata' :key='key'>{{ key }}: {{ item }}</li> -->
                 <li v-if='metadata.title'>Title: "{{ metadata.title }}",</li>
                 <li v-if='metadata.photoId'>Id: {{ metadata.photoId }},</li>
                 <li v-if='metadata.audio'>
@@ -399,6 +391,10 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   pointer-events: none;
 
+  @include mobile() {
+    display: none;
+  }
+
   &-l,
   &-r {
     height: 100%;
@@ -430,6 +426,10 @@ onBeforeUnmount(() => {
     display: flex;
     justify-content: center;
     padding: desktop-vw(80px) desktop-vw(100px);
+
+    @include mobile() {
+      padding: mobile-vw(20px);
+    }
 
     &-im {
       display: none;
@@ -464,11 +464,21 @@ onBeforeUnmount(() => {
         color: #000000;
         /* mix-blend-mode: difference; */
 
+        @include mobile() {
+          padding: mobile-vw(10px);
+          font-size: mobile-vw(8px);
+          line-height: mobile-vw(12px);
+        }
+
         &-l {
           display: flex;
           flex-direction: column;
           gap: desktop-vw(10px);
           position: relative;
+
+          @include mobile() {
+            gap: 0;
+          }
 
           &>li {
             position: relative;
@@ -477,6 +487,10 @@ onBeforeUnmount(() => {
 
             &:last-child {
               margin-top: desktop-vw(40px);
+
+              @include mobile() {
+                margin-top: mobile-vw(40px);
+              }
             }
 
             span {
@@ -485,6 +499,10 @@ onBeforeUnmount(() => {
               &:not(:first-child) {
                 &:not(:last-child) {
                   margin-left: desktop-vw(20px);
+
+                  @include mobile() {
+                    margin-left: mobile-vw(20px);
+                  }
                 }
               }
             }
@@ -522,7 +540,11 @@ onBeforeUnmount(() => {
     align-items: flex-end;
 
     &-t {
-      flex: 0 0 calc((100% / 12) * 2 + desktop-vw(20px))
+      flex: 0 0 calc((100% / 12) * 2 + desktop-vw(20px));
+
+      @include mobile() {
+        flex: 0 0 25%;
+      }
     }
 
     &-a {
@@ -533,6 +555,10 @@ onBeforeUnmount(() => {
       display: flex;
       align-items: center;
       gap: desktop-vw(12px);
+
+      @include mobile() {
+        flex: 0 0 25%;
+      }
 
       &>span {
 

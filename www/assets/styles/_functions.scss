@@ -77,8 +77,8 @@
   text-transform: uppercase;
 
   @media (min-width: 2800px) {
-    font-size: 0.75vw;
-    line-height: 1vw;
+    font-size: desktop-vw(12px);
+    line-height: desktop-vw(13px);
   }
 
   @media (max-width: 1000px) {
@@ -92,8 +92,8 @@
   }
 
   @include mobile() {
-    font-size: mobile-vw(14px);
-    line-height: mobile-vh(16.8px);
+    font-size: mobile-vw(12px);
+    line-height: mobile-vh(13px);
   }
 
   /* @include tablet() { */

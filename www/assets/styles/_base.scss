@@ -28,6 +28,7 @@ body {
 
   @include mobile() {
     min-height: 100svh;
+    padding: mobile-vw(10px);
   }
 }
 
@@ -53,4 +54,9 @@ body {
 }
 
 a {
+  transition: 200ms text-decoration ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }

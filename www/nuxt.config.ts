@@ -2,7 +2,7 @@ import glsl from 'vite-plugin-glsl'
 
 export default defineNuxtConfig({
   devtools: {enabled: false},
-  modules: ['@nuxtjs/sanity'],
+  modules: ['@nuxtjs/sanity', '@nuxtjs/device'],
   pages: true,
 
   routeRules: {
