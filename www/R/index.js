@@ -112,6 +112,7 @@ export default class R {
     this.toHomeTl = toHomeAnima({photos: this.photoArray})
     this.toHomeTl.eventCallback('onComplete', () => {
       this.isDetail = false
+      this.photoArray.forEach(p => (p.isDetail = false))
       this.inTransition = false
       this.app.$lenis.scrollTo(this.scrollMemory, {
         immediate: true,
@@ -130,6 +131,7 @@ export default class R {
     this.toDetailTl = toDetailAnima({photos: this.photoArray, info: isInfo})
     this.toDetailTl.eventCallback('onStart', () => {
       this.isDetail = true
+      this.photoArray.forEach(p => (p.isDetail = true))
       this.inTransition = true
       this.app.$lenis.stop()
     })
@@ -143,6 +145,7 @@ export default class R {
     this.toDetailTl = toDetailAnima({photos: this.photoArray, info: isInfo})
     this.toDetailTl.eventCallback('onStart', () => {
       this.isDetail = true
+      this.photoArray.forEach(p => (p.isDetail = true))
       this.inTransition = true
       this.app.$lenis.stop()
     })
@@ -156,6 +159,7 @@ export default class R {
     this.toDetailTl = toDetailAnima({photos: this.photoArray, info: isInfo})
     this.toDetailTl.eventCallback('onStart', () => {
       this.isDetail = true
+      this.photoArray.forEach(p => (p.isDetail = true))
       this.inTransition = true
       this.app.$lenis.stop()
     })

@@ -7,6 +7,7 @@ export default class Photo {
   constructor({data, index}) {
     this.element = null
     this.scroll = 0
+    this.isDetail = false
 
     // Image Transform
     const IMG_TRANSFORM = '?auto=format&w=300'
@@ -153,8 +154,13 @@ export default class Photo {
         bounds.height / 2 +
         this.scroll
 
-      this.mesh.position.x = x
-      this.mesh.position.y = y
+      if (this.isDetail === false) {
+        this.mesh.position.x = x
+        this.mesh.position.y = y
+      } else {
+        this.mesh.position.x = x
+        this.mesh.position.y = y + 100
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 <script setup>
 useHead({
-  title: 'Ash Thorp',
+  title: 'ALT SEEN',
   // description: 'c/o Ben Paine',
   meta: [
     {
@@ -21,8 +21,8 @@ useHead({
   ]
 })
 useSeoMeta({
-  title: 'Ash Thorp',
-  ogTitle: 'Ash Thorp',
+  title: 'ALT SEEN',
+  ogTitle: 'ALT SEEN',
   // description: 'c/o Ben Paine',
   // ogDescription: 'c/o Ben Paine',
   ogImage: 'https://www.altseen.com/atp-og.png',

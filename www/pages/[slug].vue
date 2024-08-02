@@ -53,6 +53,7 @@ const gradientElement = ref(null)
 const metadataActive = ref(false)
 const metadata = ref(null)
 const waiting = useWaiting()
+const { isMobile } = useDevice();
 
 watch(() => dataStore.value, () => {
   setImages()
@@ -235,6 +236,29 @@ onMounted(async () => {
 
   // intro animation
   let intro = gsap.timeline({ paused: true })
+
+  if (isMobile === true) {
+    intro.to(
+      [document.body],
+      {
+        background: '#000000',
+        duration: 1,
+        color: '#ffffff',
+        ease: 'custom',
+      },
+      '<',
+    )
+    intro.to(
+      ['.n'],
+      {
+        duration: 1,
+        color: '#ffffff',
+        ease: 'custom',
+      },
+      '<',
+    )
+  }
+
   intro.to('.d-i', {
     opacity: 1,
     duration: waiting.value ? 1 : .6,
@@ -279,7 +303,8 @@ onBeforeUnmount(() => {
       </div>
       <div class='d-container'>
         <div :class="{ active: loaded === false }" class='d-container-im'>
-          <img :style="{ 'height': '100%', 'width': '100%' }" :src="data.photo.asset.metadata.lqip" alt="">
+          <!-- <img :style="{ 'height': '100%', 'aspect-ratio': `${data.photo.asset.metadata.dimensions.aspectRatio}` }" -->
+          <!--   :src="data.photo.asset.metadata.lqip" alt=""> -->
         </div>
         <div :class="{ active: loaded === true }" class='d-container-im'>
           <div ref='gradientElement' class='d-container-im-o'
@@ -392,7 +417,9 @@ onBeforeUnmount(() => {
   pointer-events: none;
 
   @include mobile() {
-    display: none;
+    /* display: none; */
+    height: calc(100% - mobile-vw(20px));
+    width: calc(100% - mobile-vw(20px));
   }
 
   &-l,
@@ -400,6 +427,10 @@ onBeforeUnmount(() => {
     height: 100%;
     width: 10%;
     pointer-events: auto;
+
+    @include mobile() {
+      width: 50%;
+    }
   }
 
   &-l {
@@ -432,15 +463,17 @@ onBeforeUnmount(() => {
     }
 
     &-im {
-      display: none;
+      display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       position: relative;
       overflow: hidden;
+      opacity: 0;
+      transition: 300ms opacity ease-out;
 
       &.active {
-        display: flex;
+        opacity: 1;
       }
 
       &-o {
