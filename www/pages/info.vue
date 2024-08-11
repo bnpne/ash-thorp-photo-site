@@ -123,17 +123,17 @@ onMounted(() => {
         <ul>
           <li>Contact</li>
           <li>
-            <NuxtLink to='https://twitter.com/ashthorp1' target='blank' ref="noreferrer">ashthorp.twitter</NuxtLink>
+            <NuxtLink to='https://twitter.com/ashthorp1' target='blank' ref="noreferrer">Twitter</NuxtLink>
           </li>
           <li>
-            <NuxtLink to='https://www.instagram.com/ashthorp' target='blank' ref="noreferrer">ashthorp.instagram
+            <NuxtLink to='https://www.instagram.com/ashthorp' target='blank' ref="noreferrer">Instagram
             </NuxtLink>
           </li>
           <li>
-            <NuxtLink to='https://www.behance.net/ashthorp' target='blank' ref="noreferrer">ashthorp.behance</NuxtLink>
+            <NuxtLink to='https://www.behance.net/ashthorp' target='blank' ref="noreferrer">Behance</NuxtLink>
           </li>
           <li>
-            <NuxtLink to='https://www.behance.net/ashthorp' target='blank' ref="noreferrer">ashthorp.vimeo</NuxtLink>
+            <NuxtLink to='https://vimeo.com/ashthorp' target='blank' ref="noreferrer">Vimeo</NuxtLink>
           </li>
         </ul>
       </div>
@@ -145,7 +145,7 @@ onMounted(() => {
             <NuxtLink to='mailto:bentppaine@gmail.com' target='blank' ref='noreferrer'>Ben Paine</NuxtLink>
           </li>
           <li>
-            <NuxtLink to='https://instagram.com/bnpne' target='blank' ref='noreferrer'>Social</NuxtLink>
+            <NuxtLink to='https://instagram.com/bnpne' target='blank' ref='noreferrer'>Instagram</NuxtLink>
           </li>
         </ul>
 
