@@ -1,11 +1,8 @@
 import * as THREE from 'three'
 import Sizes from './Sizes'
 import Photo from './Photo'
-import gsap from 'gsap'
-
 import {useRouter} from 'vue-router'
 import {useNuxtApp} from '#app'
-
 import {toDetailAnima, toHomeAnima} from '~/utils/anima'
 
 const CAMERA_POS_Z = 500
@@ -23,6 +20,7 @@ export default class R {
     this.toDetailTl = null
     this.toHomeTl = null
     this.scrollMemory
+    this.timer
 
     this.router = useRouter()
 
@@ -47,7 +45,7 @@ export default class R {
     this.scene = new THREE.Scene()
 
     this.camera = new THREE.PerspectiveCamera(
-      50,
+      this.calcFov(),
       this.sizes.width / this.sizes.height,
       10,
       1000,
@@ -171,15 +169,20 @@ export default class R {
    * Resize
    */
   resize() {
-    this.camera.aspect = this.sizes.aspect
-    this.camera.fov = this.calcFov()
-    this.camera.updateProjectionMatrix()
-    this.renderer.setSize(this.sizes.width, this.sizes.height)
-    this.renderer.setPixelRatio(this.sizes.pixelRatio)
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.camera.aspect = this.sizes.aspect
+      this.camera.fov = this.calcFov()
+      this.camera.updateProjectionMatrix()
 
-    this.photoArray.forEach(photo => {
-      photo.resize()
-    })
+      this.renderer.setSize(this.sizes.width, this.sizes.height)
+      this.renderer.setPixelRatio(this.sizes.pixelRatio)
+
+      // debounce resize of planes
+      this.photoArray.forEach((photo, i) => {
+        photo.resize()
+      })
+    }, 250)
   }
 
   /**
@@ -214,6 +217,8 @@ export default class R {
    * Calculate Field of View
    */
   calcFov() {
-    return (2 * Math.atan(this.sizes.height / 2 / CAMERA_POS_Z) * 180) / Math.PI
+    return (
+      2 * Math.atan(this.sizes.height / (2 * CAMERA_POS_Z)) * (180 / Math.PI)
+    )
   }
 }

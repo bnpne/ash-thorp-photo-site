@@ -128,13 +128,16 @@ export default class Photo {
     if (this.element) {
       let bounds = this.element.getBoundingClientRect()
 
-      if (this.metadata.dimensions.aspectRatio >= 1) {
-        this.scale.x = bounds.width
-        this.scale.y = bounds.width / this.metadata.dimensions.aspectRatio
-      } else if (this.metadata.dimensions.aspectRatio < 1) {
-        this.scale.x = bounds.height * this.metadata.dimensions.aspectRatio
-        this.scale.y = bounds.height
-      }
+      // if (this.metadata.dimensions.aspectRatio >= 1) {
+      //   this.scale.x = bounds.width
+      //   this.scale.y = bounds.width / this.metadata.dimensions.aspectRatio
+      // } else if (this.metadata.dimensions.aspectRatio < 1) {
+      //   this.scale.x = bounds.height * this.metadata.dimensions.aspectRatio
+      //   this.scale.y = bounds.height
+      // }
+
+      this.scale.x = bounds.width
+      this.scale.y = bounds.height
 
       this.mesh.material.uniforms.scale.value = [this.scale.x, this.scale.y]
 
@@ -145,8 +148,8 @@ export default class Photo {
   setPosition() {
     if (this.element) {
       let bounds = this.element.getBoundingClientRect()
-      // let x = bounds.left - this.sizes.width / 2 + bounds.width / 2
-      let x = bounds.left - this.sizes.width / 2 + this.mesh.scale.x / 2
+      let x = bounds.left - this.sizes.width / 2 + bounds.width / 2
+      // let x = bounds.left - this.sizes.width / 2 + this.mesh.scale.x / 2
       let y =
         -this.scroll -
         bounds.top +
