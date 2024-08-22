@@ -121,7 +121,7 @@ onMounted(() => {
       </div>
       <div id='i-a' class='i-credits'>
         <ul>
-          <li>Contact</li>
+          <!-- <li>Contact</li> -->
           <li>
             <NuxtLink to='https://twitter.com/ashthorp1' target='blank' ref="noreferrer">Twitter</NuxtLink>
           </li>
