@@ -140,8 +140,19 @@ export default class Photo {
       this.scale.y = bounds.height
 
       this.mesh.material.uniforms.scale.value = [this.scale.x, this.scale.y]
+      // if (this.index === 0) {
+      //   console.log(bounds, this.scale)
+      // }
 
       this.mesh.scale.set(this.scale.x, this.scale.y, 1)
+      // if (this.index === 0) {
+      //   console.log({
+      //     boundsWidth: bounds.width,
+      //     boundsHeight: bounds.height,
+      //     meshWidth: this.mesh.scale.x,
+      //     meshHeight: this.mesh.scale.y,
+      //   })
+      // }
     }
   }
 

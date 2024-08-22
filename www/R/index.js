@@ -4,6 +4,7 @@ import Photo from './Photo'
 import {useRouter} from 'vue-router'
 import {useNuxtApp} from '#app'
 import {toDetailAnima, toHomeAnima} from '~/utils/anima'
+import GUI from 'lil-gui'
 
 const CAMERA_POS_Z = 500
 
@@ -23,7 +24,6 @@ export default class R {
     this.timer
 
     this.router = useRouter()
-
     this.app = useNuxtApp()
 
     this.init()
@@ -44,14 +44,15 @@ export default class R {
 
     this.scene = new THREE.Scene()
 
+    this.distance = CAMERA_POS_Z
     this.camera = new THREE.PerspectiveCamera(
       this.calcFov(),
       this.sizes.width / this.sizes.height,
-      10,
-      1000,
+      0.1,
+      this.distance,
     )
-    this.camera.position.z = CAMERA_POS_Z
-    this.camera.fov = this.calcFov()
+    this.camera.position.z = this.distance
+
     this.camera.updateProjectionMatrix()
 
     this.scene.add(this.camera)
@@ -171,9 +172,16 @@ export default class R {
   resize() {
     clearTimeout(this.timer)
     this.timer = setTimeout(() => {
-      this.camera.aspect = this.sizes.aspect
+      this.camera.aspect = this.sizes.width / this.sizes.height
       this.camera.fov = this.calcFov()
+      this.camera.position.z = CAMERA_POS_Z
       this.camera.updateProjectionMatrix()
+
+      /// ORTHO
+      // this.camera.left = this.sizes.width / -2
+      // this.camera.right = this.sizes.width / 2
+      // this.camera.top = this.sizes.height / 2
+      // this.camera.bottom = this.sizes.height / -2
 
       this.renderer.setSize(this.sizes.width, this.sizes.height)
       this.renderer.setPixelRatio(this.sizes.pixelRatio)
@@ -218,7 +226,7 @@ export default class R {
    */
   calcFov() {
     return (
-      2 * Math.atan(this.sizes.height / (2 * CAMERA_POS_Z)) * (180 / Math.PI)
+      2 * Math.atan(this.sizes.height / (2 * this.distance)) * (180 / Math.PI)
     )
   }
 }

@@ -11,7 +11,7 @@ const app = useNuxtApp()
     </div>
     <div class='n-c'>
       <NuxtLink to='/info'>Info</NuxtLink>
-      <NuxtLink to='mailto:ash@altcinc.com' target='_blank' ref='noreferrer'>Email</NuxtLink>
+      <NuxtLink to='mailto:info@altcinc.com' target='_blank' ref='noreferrer'>Email</NuxtLink>
     </div>
   </nav>
 </template>
