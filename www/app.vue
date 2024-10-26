@@ -82,15 +82,13 @@ onMounted(async () => {
 
           let prevIndex;
           if (activeIndex.value === 0) {
-            prevIndex = dataStore.value.photos.length - 1;
+            prevIndex = allPhotos.value.length - 1;
           } else {
             prevIndex = activeIndex.value - 1;
           }
 
           if (prevIndex !== undefined) {
-            await navigateTo(
-              `/${dataStore.value.photos[prevIndex].slug?.current}`
-            );
+            await navigateTo(`/${allPhotos.value[prevIndex].slug?.current}`);
           }
         }
       }
@@ -99,16 +97,14 @@ onMounted(async () => {
           // 1
 
           let nextIndex;
-          if (activeIndex.value === dataStore.value.photos.length - 1) {
+          if (activeIndex.value === allPhotos.value.length - 1) {
             nextIndex = 0;
           } else {
             nextIndex = activeIndex.value + 1;
           }
 
           if (nextIndex !== undefined) {
-            await navigateTo(
-              `/${dataStore.value.photos[nextIndex].slug?.current}`
-            );
+            await navigateTo(`/${allPhotos.value[nextIndex].slug?.current}`);
           }
         }
       }
@@ -217,6 +213,16 @@ onMounted(async () => {
           }
         });
 
+        tl.from(
+          ["#title"],
+          {
+            opacity: 0,
+            duration: 1,
+            ease: "easeOutQuint",
+          },
+          "<"
+        );
+
         tl.play();
       });
     } else {
@@ -263,9 +269,11 @@ onMounted(async () => {
     <template v-if="dataStore">
       <div ref="grid" class="h">
         <template v-for="collection in dataStore.collections">
-          <div id="title" class="h-t">
-            <h2>{{ collection.title }}</h2>
-          </div>
+          <template v-if="dataStore.collections.length > 1">
+            <div id="title" class="h-t">
+              <h2>{{ collection.title }}</h2>
+            </div>
+          </template>
           <div v-if="collection.photos" class="h-c">
             <template v-if="isMobile === false">
               <NuxtLink
