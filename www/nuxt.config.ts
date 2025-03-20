@@ -1,33 +1,23 @@
-import glsl from 'vite-plugin-glsl'
+import glsl from "vite-plugin-glsl";
 
 export default defineNuxtConfig({
-  devtools: {enabled: false},
-  modules: ['@nuxtjs/sanity', '@nuxtjs/device'],
+  devtools: { enabled: false },
+  modules: ["@nuxtjs/sanity", "@nuxtjs/device"],
   pages: true,
-
-  routeRules: {
-    '/': {prerender: true},
-    '/**': {prerender: true},
-  },
+  ssr: true,
 
   sanity: {
     projectId: process.env.NUXT_SANITY_ID,
-    dataset: 'production',
+    dataset: "production",
     useCdn: true,
-    apiVersion: '2023-05-03',
+    apiVersion: "2023-05-03",
   },
 
   build: {
-    transpile: ['gsap', 'three'],
+    transpile: ["gsap", "three"],
   },
 
-  runtimeConfig: {
-    sanity: {
-      projectId: process.env.NUXT_SANITY_ID,
-    },
-  },
-
-  css: ['@/assets/styles/globals.scss'],
+  css: ["@/assets/styles/globals.scss"],
 
   vite: {
     plugins: [glsl()],
@@ -40,5 +30,5 @@ export default defineNuxtConfig({
     },
   },
 
-  compatibilityDate: '2024-07-02',
-})
+  compatibilityDate: "2024-07-02",
+});

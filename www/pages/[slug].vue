@@ -49,8 +49,8 @@ definePageMeta({
 const route = useRoute();
 const slug = ref(null);
 const dataStore = useData();
-const allPhotos = useAllPhotos();
-const data = ref(null);
+const allPhotos = ref(null);
+const pageData = ref(null)
 const isUntitled = ref(false);
 const audio = ref(null);
 const audioIsPlaying = ref(false);
@@ -65,12 +65,7 @@ const metadata = ref(null);
 const waiting = useWaiting();
 const { isMobile } = useDevice();
 
-watch(
-  () => allPhotos.value,
-  () => {
-    setImages();
-  }
-);
+
 
 const handleNavLeft = async () => {
   // -1
@@ -166,182 +161,199 @@ const setImages = () => {
     allPhotos.value.forEach((photo, i) => {
       if (photo.slug && photo.slug.current === slug.value) {
         index.value = i;
-        data.value = photo;
+        pageData.value = photo;
       }
     });
   }
 };
 
+
+const query = groq`*[_type=='main']{
+  ..., collections[]{
+    ...,
+    photos[]->{..., photo{..., asset->}, audio{..., asset->}}
+  }}`;
+const { data } = useLazySanityQuery(query);
+
 onMounted(async () => {
-  slug.value = route.params.slug;
+  slug.value = route.params.slug
+  if (data) {
+    const collections = data.value[0].collections;
+    const pa = Object.values(collections)
+      .flat()
+      .flatMap((collection) => toRaw(collection.photos));
 
-  setImages();
+    allPhotos.value = pa
 
+    setImages()
+  }
   await nextTick();
 
-  // create metadata
-  let m = {
-    title: data.value.title,
-    audio: {
-      id: data.value?.audio?.asset.assetId,
-      path: data.value?.audio?.asset.path,
-    },
-    exif: {
-      ApertureValue: data.value.photo.asset.metadata.exif.ApertureValue
-        ? data.value.photo.asset.metadata.exif.ApertureValue
-        : "null",
-      BrightnessValue: data.value.photo.asset.metadata.exif.BrightnessValue
-        ? data.value.photo.asset.metadata.exif.BrightnessValue
-        : "null",
-      DateDigitized: data.value.photo.asset.metadata.exif.DateTimeDigitized
-        ? data.value.photo.asset.metadata.exif.DateTimeDigitized
-        : "null",
-      ExposureMode: data.value.photo.asset.metadata.exif.ExposureMode
-        ? data.value.photo.asset.metadata.exif.ExposureMode
-        : "null",
-      ExposureTime: data.value.photo.asset.metadata.exif.ExposureTime
-        ? data.value.photo.asset.metadata.exif.ExposureTime
-        : "null",
-      FStop: data.value.photo.asset.metadata.exif.FNumber
-        ? data.value.photo.asset.metadata.exif.FNumber
-        : "null",
-      Flash: data.value.photo.asset.metadata.exif.Flash
-        ? data.value.photo.asset.metadata.exif.Flash
-        : "null",
-      FocalLength: data.value.photo.asset.metadata.exif.FocalLength
-        ? data.value.photo.asset.metadata.exif.FocalLength
-        : "null",
-      "35mmFocalLength": data.value.photo.asset.metadata.exif
-        .FocalLengthIn35mmFormat
-        ? data.value.photo.asset.metadata.exif.FocalLengthIn35mmFormat
-        : "null",
-      ISO: data.value.photo.asset.metadata.exif.ISO
-        ? data.value.photo.asset.metadata.exif.ISO
-        : "null",
-      LensMake: data.value.photo.asset.metadata.exif.LensMake
-        ? data.value.photo.asset.metadata.exif.LensMake
-        : "null",
-      LensModel: data.value.photo.asset.metadata.exif.LensModel
-        ? data.value.photo.asset.metadata.exif.LensModel
-        : "null",
-      LensSpecification: data.value.photo.asset.metadata.exif.LensSpecification
-        ? data.value.photo.asset.metadata.exif.LensSpecification
-        : "null",
-      Sharpness: data.value.photo.asset.metadata.exif.Sharpness
-        ? data.value.photo.asset.metadata.exif.Sharpness
-        : "null",
-      ShutterSpeedValue: data.value.photo.asset.metadata.exif.ShutterSpeedValue
-        ? data.value.photo.asset.metadata.exif.ShutterSpeedValue
-        : "null",
-      WhiteBalance: data.value.photo.asset.metadata.exif.WhiteBalance
-        ? data.value.photo.asset.metadata.exif.WhiteBalance
-        : "null",
-      ColorSpace: data.value.photo.asset.metadata.exif.ColorSpace
-        ? data.value.photo.asset.metadata.exif.ColorSpace
-        : "null",
-      FocalPlane: {
-        x: data.value.photo.asset.metadata.exif.FocalPlaneXResolution,
-        y: data.value.photo.asset.metadata.exif.FocalPlaneYResolution,
+  if (pageData.value) {
+    // create metadata
+    let m = {
+      title: pageData.value.title,
+      audio: {
+        id: pageData.value?.audio?.asset.assetId,
+        path: pageData.value?.audio?.asset.path,
       },
-    },
-    palette: {
-      dominant: data.value.photo.asset.metadata.palette.dominant.background,
-      muted: data.value.photo.asset.metadata.palette.muted.background,
-      vibrant: data.value.photo.asset.metadata.palette.vibrant.background,
-    },
-    photoId: data.value.photo.asset.assetId,
-    path: data.value.photo.asset.path,
-    size: data.value.photo.asset.size,
-    mime: data.value.photo.asset.mimeType,
-    blurHash: data.value.photo.asset.metadata.blurHash,
-    alpha: data.value.photo.asset.metadata.hasAlpha,
-  };
-  m = JSON.stringify(m);
-  m = JSON.parse(m);
-  metadata.value = m;
+      exif: {
+        ApertureValue: pageData.value.photo.asset.metadata.exif.ApertureValue
+          ? pageData.value.photo.asset.metadata.exif.ApertureValue
+          : "null",
+        BrightnessValue: pageData.value.photo.asset.metadata.exif.BrightnessValue
+          ? pageData.value.photo.asset.metadata.exif.BrightnessValue
+          : "null",
+        DateDigitized: pageData.value.photo.asset.metadata.exif.DateTimeDigitized
+          ? pageData.value.photo.asset.metadata.exif.DateTimeDigitized
+          : "null",
+        ExposureMode: pageData.value.photo.asset.metadata.exif.ExposureMode
+          ? pageData.value.photo.asset.metadata.exif.ExposureMode
+          : "null",
+        ExposureTime: pageData.value.photo.asset.metadata.exif.ExposureTime
+          ? pageData.value.photo.asset.metadata.exif.ExposureTime
+          : "null",
+        FStop: pageData.value.photo.asset.metadata.exif.FNumber
+          ? pageData.value.photo.asset.metadata.exif.FNumber
+          : "null",
+        Flash: pageData.value.photo.asset.metadata.exif.Flash
+          ? pageData.value.photo.asset.metadata.exif.Flash
+          : "null",
+        FocalLength: pageData.value.photo.asset.metadata.exif.FocalLength
+          ? pageData.value.photo.asset.metadata.exif.FocalLength
+          : "null",
+        "35mmFocalLength": pageData.value.photo.asset.metadata.exif
+          .FocalLengthIn35mmFormat
+          ? pageData.value.photo.asset.metadata.exif.FocalLengthIn35mmFormat
+          : "null",
+        ISO: pageData.value.photo.asset.metadata.exif.ISO
+          ? pageData.value.photo.asset.metadata.exif.ISO
+          : "null",
+        LensMake: pageData.value.photo.asset.metadata.exif.LensMake
+          ? pageData.value.photo.asset.metadata.exif.LensMake
+          : "null",
+        LensModel: pageData.value.photo.asset.metadata.exif.LensModel
+          ? pageData.value.photo.asset.metadata.exif.LensModel
+          : "null",
+        LensSpecification: pageData.value.photo.asset.metadata.exif.LensSpecification
+          ? pageData.value.photo.asset.metadata.exif.LensSpecification
+          : "null",
+        Sharpness: pageData.value.photo.asset.metadata.exif.Sharpness
+          ? pageData.value.photo.asset.metadata.exif.Sharpness
+          : "null",
+        ShutterSpeedValue: pageData.value.photo.asset.metadata.exif.ShutterSpeedValue
+          ? pageData.value.photo.asset.metadata.exif.ShutterSpeedValue
+          : "null",
+        WhiteBalance: pageData.value.photo.asset.metadata.exif.WhiteBalance
+          ? pageData.value.photo.asset.metadata.exif.WhiteBalance
+          : "null",
+        ColorSpace: pageData.value.photo.asset.metadata.exif.ColorSpace
+          ? pageData.value.photo.asset.metadata.exif.ColorSpace
+          : "null",
+        FocalPlane: {
+          x: pageData.value.photo.asset.metadata.exif.FocalPlaneXResolution,
+          y: pageData.value.photo.asset.metadata.exif.FocalPlaneYResolution,
+        },
+      },
+      palette: {
+        dominant: pageData.value.photo.asset.metadata.palette.dominant.background,
+        muted: pageData.value.photo.asset.metadata.palette.muted.background,
+        vibrant: pageData.value.photo.asset.metadata.palette.vibrant.background,
+      },
+      photoId: pageData.value.photo.asset.assetId,
+      path: pageData.value.photo.asset.path,
+      size: pageData.value.photo.asset.size,
+      mime: pageData.value.photo.asset.mimeType,
+      blurHash: pageData.value.photo.asset.metadata.blurHash,
+      alpha: pageData.value.photo.asset.metadata.hasAlpha,
+    };
+    m = JSON.stringify(m);
+    m = JSON.parse(m);
+    metadata.value = m;
 
-  // create gradient
-  if (data.value.photo.asset.metadata.palette.dominant) {
-    let darkVibrant =
-      data.value.photo.asset.metadata.palette.darkVibrant.background;
-    let darkMuted =
-      data.value.photo.asset.metadata.palette.darkMuted.background;
-    let lightMuted =
-      data.value.photo.asset.metadata.palette.lightMuted.background;
-    let lightVibrant =
-      data.value.photo.asset.metadata.palette.lightVibrant.background;
+    // create gradient
+    if (pageData.value.photo.asset.metadata.palette.dominant) {
+      let darkVibrant =
+        pageData.value.photo.asset.metadata.palette.darkVibrant.background;
+      let darkMuted =
+        pageData.value.photo.asset.metadata.palette.darkMuted.background;
+      let lightMuted =
+        pageData.value.photo.asset.metadata.palette.lightMuted.background;
+      let lightVibrant =
+        pageData.value.photo.asset.metadata.palette.lightVibrant.background;
 
-    gradient.darkVibrant = darkVibrant;
-    gradient.darkMuted = darkMuted;
-    gradient.lightMuted = lightMuted;
-    gradient.lightVibrant = lightVibrant;
+      gradient.darkVibrant = darkVibrant;
+      gradient.darkMuted = darkMuted;
+      gradient.lightMuted = lightMuted;
+      gradient.lightVibrant = lightVibrant;
 
-    if (gradientElement.value) {
-      gradientElement.value.style.background = `linear-gradient(70deg, ${gradient.lightVibrant}, ${gradient.lightMuted}, ${gradient.darkMuted})`;
+      if (gradientElement.value) {
+        gradientElement.value.style.background = `linear-gradient(70deg, ${gradient.lightVibrant}, ${gradient.lightMuted}, ${gradient.darkMuted})`;
+      }
     }
-  }
 
-  // handle exposure time
-  if (data.value.photo.asset.metadata.exif.ExposureTime) {
-    let decimal = data.value.photo.asset.metadata.exif.ExposureTime;
+    // handle exposure time
+    if (pageData.value.photo.asset.metadata.exif.ExposureTime) {
+      let decimal = pageData.value.photo.asset.metadata.exif.ExposureTime;
 
-    let fraction = decimalToFraction(decimal);
+      let fraction = decimalToFraction(decimal);
 
-    ss.value = fraction;
-  }
+      ss.value = fraction;
+    }
 
-  // intro animation
-  let intro = gsap.timeline({ paused: true });
+    // intro animation
+    let intro = gsap.timeline({ paused: true });
 
-  if (isMobile === true) {
-    intro.to(
-      [document.body],
-      {
-        background: "#000000",
-        duration: 1,
-        color: "#ffffff",
-        ease: "custom",
-      },
-      "<"
-    );
-    intro.to(
-      [".n"],
-      {
-        duration: 1,
-        color: "#ffffff",
-        ease: "custom",
-      },
-      "<"
-    );
-  }
+    if (isMobile === true) {
+      intro.to(
+        [document.body],
+        {
+          background: "#000000",
+          duration: 1,
+          color: "#ffffff",
+          ease: "custom",
+        },
+        "<"
+      );
+      intro.to(
+        [".n"],
+        {
+          duration: 1,
+          color: "#ffffff",
+          ease: "custom",
+        },
+        "<"
+      );
+    }
 
-  intro
-    .to(
-      ".d-i",
-      {
-        opacity: 1,
-        duration: waiting.value ? 1 : 0.6,
-        delay: waiting.value ? 1.2 : 0,
-        ease: "easeOutQuint",
-      },
-      "<"
-    )
-    .from(
-      ".d-container",
-      {
-        opacity: 0,
-        duration: waiting.value ? 1 : 0.6,
-        ease: "easeOutQuint",
-      },
-      "<"
-    );
+    intro
+      .to(
+        ".d-i",
+        {
+          opacity: 1,
+          duration: waiting.value ? 1 : 0.6,
+          delay: waiting.value ? 1.2 : 0,
+          ease: "easeOutQuint",
+        },
+        "<"
+      )
+      .from(
+        ".d-container",
+        {
+          opacity: 0,
+          duration: waiting.value ? 1 : 0.6,
+          ease: "easeOutQuint",
+        },
+        "<"
+      );
 
-  intro.play();
+    intro.play();
 
-  // handle audio
-  if (data.value.audio !== null) {
-    audio.value = new Audio(data.value.audio.asset.url);
-    audio.value.loop = true;
+    // handle audio
+    if (pageData.value.audio !== null) {
+      audio.value = new Audio(pageData.value.audio.asset.url);
+      audio.value.loop = true;
+    }
   }
 });
 
@@ -355,7 +367,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div id="page" class="d">
-    <div v-if="data" class="d-c">
+    <div v-if="pageData" class="d-c">
       <div class="navigate">
         <div @click="handleNavLeft" class="navigate-l"></div>
         <div @click="handleNavRight" class="navigate-r"></div>
@@ -366,13 +378,9 @@ onBeforeUnmount(() => {
           <!--   :src="data.photo.asset.metadata.lqip" alt=""> -->
         </div>
         <div :class="{ active: loaded === true }" class="d-container-im">
-          <div
-            ref="gradientElement"
-            class="d-container-im-o"
-            :style="{
-              'aspect-ratio': data.photo.asset.metadata.dimensions.aspectRatio,
-            }"
-          >
+          <div ref="gradientElement" class="d-container-im-o" :style="{
+            'aspect-ratio': pageData.photo.asset.metadata.dimensions.aspectRatio,
+          }">
             <div class="d-container-im-m" v-if="metadata">
               <ul class="d-container-im-m-l">
                 <li v-if="metadata.title">Title: "{{ metadata.title }}",</li>
@@ -398,54 +406,34 @@ onBeforeUnmount(() => {
                   </template>
                   <template v-else>
                     <span>EXIF: {</span>
-                    <span
-                      >Date Digitized:
+                    <span>Date Digitized:
                       {{
                         format(
                           new Date(metadata.exif.DateDigitized),
                           "MM-dd-yyy HH:mm:ss a"
                         )
-                      }},</span
-                    >
+                      }},</span>
                     <span>Lens Make: {{ metadata.exif.LensMake }},</span>
                     <span>Lens Model: {{ metadata.exif.LensModel }},</span>
-                    <span
-                      >Lens Specification:
-                      {{ metadata.exif.LensSpecification }},</span
-                    >
-                    <span
-                      >Brightness: {{ metadata.exif.BrightnessValue }},</span
-                    >
+                    <span>Lens Specification:
+                      {{ metadata.exif.LensSpecification }},</span>
+                    <span>Brightness: {{ metadata.exif.BrightnessValue }},</span>
                     <span>Sharpness: {{ metadata.exif.Sharpness }},</span>
-                    <span
-                      >White Balance: {{ metadata.exif.WhiteBalance }},</span
-                    >
+                    <span>White Balance: {{ metadata.exif.WhiteBalance }},</span>
                     <span>ISO: {{ metadata.exif.ISO }},</span>
                     <span>Aperture: {{ metadata.exif.ApertureValue }},</span>
                     <span>F Stop: {{ metadata.exif.FStop }},</span>
-                    <span
-                      >Shutter Speed:
-                      {{ metadata.exif.ShutterSpeedValue }},</span
-                    >
+                    <span>Shutter Speed:
+                      {{ metadata.exif.ShutterSpeedValue }},</span>
                     <span>Focal Length: {{ metadata.exif.FocalLength }},</span>
-                    <span
-                      >Focal Plane: {{ metadata.exif.FocalPlane.x }},
-                      {{ metadata.exif.FocalPlane.y }},</span
-                    >
-                    <span
-                      >Exposure Time: {{ metadata.exif.ExposureTime }},</span
-                    >
-                    <span
-                      >Exposure Mode: {{ metadata.exif.ExposureMode }},</span
-                    >
-                    <span
-                      >Flash:
-                      {{ metadata.exif.Flash === 1 ? "True" : "False" }},</span
-                    >
-                    <span
-                      >35mm Focal Length:
-                      {{ metadata.exif["35mmFocalLength"] }},</span
-                    >
+                    <span>Focal Plane: {{ metadata.exif.FocalPlane.x }},
+                      {{ metadata.exif.FocalPlane.y }},</span>
+                    <span>Exposure Time: {{ metadata.exif.ExposureTime }},</span>
+                    <span>Exposure Mode: {{ metadata.exif.ExposureMode }},</span>
+                    <span>Flash:
+                      {{ metadata.exif.Flash === 1 ? "True" : "False" }},</span>
+                    <span>35mm Focal Length:
+                      {{ metadata.exif["35mmFocalLength"] }},</span>
                     <span>},</span>
                   </template>
                 </li>
@@ -465,39 +453,29 @@ onBeforeUnmount(() => {
               </ul>
             </div>
           </div>
-          <img
-            class="d-container-im-e"
-            @click="toggleMetadata"
-            :onload="imageLoaded"
-            :src="`${data.photo.asset.url + '?auto=format&w=2000'}`"
-            alt=""
-          />
+          <img class="d-container-im-e" @click="toggleMetadata" :onload="imageLoaded"
+            :src="`${pageData.photo.asset.url + '?auto=format&w=2000'}`" alt="" />
         </div>
       </div>
       <div class="d-i">
-        <p class="d-i-t">{{ data.title }}</p>
-        <p @click="triggerAudio" class="d-i-a" v-if="data.audio">
+        <p class="d-i-t">{{ pageData.title }}</p>
+        <p @click="triggerAudio" class="d-i-a" v-if="pageData.audio">
           <span v-if="audioIsPlaying === false"> Play Audio </span>
           <span v-else> Pause Audio </span>
         </p>
-        <div v-if="data.photo.asset.metadata" class="d-i-m">
+        <div v-if="pageData.photo.asset.metadata" class="d-i-m">
           <div class="d-i-m-i">
-            <span
-              :style="{ 'text-transform': 'none' }"
-              v-if="data.photo.asset.metadata.exif.FNumber"
-            >
-              f/{{ data.photo.asset.metadata.exif.FNumber }}
+            <span :style="{ 'text-transform': 'none' }" v-if="pageData.photo.asset.metadata.exif.FNumber">
+              f/{{ pageData.photo.asset.metadata.exif.FNumber }}
             </span>
-            <span
-              v-if="data.photo.asset.metadata.exif.ExposureTime && ss !== null"
-            >
+            <span v-if="pageData.photo.asset.metadata.exif.ExposureTime && ss !== null">
               {{ ss }}
             </span>
-            <span v-if="data.photo.asset.metadata.exif.ISO">
-              ISO {{ data.photo.asset.metadata.exif.ISO }}
+            <span v-if="pageData.photo.asset.metadata.exif.ISO">
+              ISO {{ pageData.photo.asset.metadata.exif.ISO }}
             </span>
-            <span v-if="data.photo.asset.metadata.exif">
-              CS {{ data.photo.asset.metadata.exif.ColorSpace }}
+            <span v-if="pageData.photo.asset.metadata.exif">
+              CS {{ pageData.photo.asset.metadata.exif.ColorSpace }}
             </span>
           </div>
         </div>
@@ -612,7 +590,7 @@ onBeforeUnmount(() => {
             gap: 0;
           }
 
-          & > li {
+          &>li {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -691,8 +669,8 @@ onBeforeUnmount(() => {
         flex: 0 0 25%;
       }
 
-      & > span {
-        & > svg {
+      &>span {
+        &>svg {
           display: inline-block;
           height: desktop-vw(12px);
           width: desktop-vw(9px);

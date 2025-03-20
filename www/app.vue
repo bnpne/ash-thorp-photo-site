@@ -7,10 +7,6 @@ useHead({
       charset: "UTF-8",
     },
     {
-      name: "viewport",
-      content: "width=device-width, minimum-scale=1, maximum-scale=1",
-    },
-    {
       name: "apple-mobile-web-app-capable",
       content: "yes",
     },
@@ -48,7 +44,7 @@ const query = groq`*[_type=='main']{
     ...,
     photos[]->{..., photo{..., asset->}, audio{..., asset->}}
   }}`;
-const { data } = useSanityQuery(query);
+const { data } = useLazySanityQuery(query);
 
 // Data Store
 const dataStore = useData();
@@ -276,18 +272,10 @@ onMounted(async () => {
           </template>
           <div v-if="collection.photos" class="h-c">
             <template v-if="isMobile === false">
-              <NuxtLink
-                v-for="photo in collection.photos"
-                :to="`/${photo.slug.current}`"
-                class="p"
-              ></NuxtLink>
+              <NuxtLink v-for="photo in collection.photos" :to="`/${photo.slug.current}`" class="p"></NuxtLink>
             </template>
             <template v-else>
-              <NuxtLink
-                v-for="photo in collection.photos"
-                :to="`/${photo.slug.current}`"
-                class="p"
-              >
+              <NuxtLink v-for="photo in collection.photos" :to="`/${photo.slug.current}`" class="p">
                 <img :src="`${photo.photo.asset.url}?auto = format & w=1000`" />
               </NuxtLink>
             </template>
@@ -323,12 +311,7 @@ onMounted(async () => {
     flex-direction: row;
     flex-wrap: wrap;
     margin: 0 calc((100vw / 12) + desktop-vw(20px));
-    gap: calc(
-      (
-          (100vw - (((100vw / 12) + desktop-vw(20px)) * 2) - desktop-vw(40px)) -
-            (desktop-vw(150px) * 8)
-        ) / 7
-    );
+    gap: calc(((100vw - (((100vw / 12) + desktop-vw(20px)) * 2) - desktop-vw(40px)) - (desktop-vw(150px) * 8)) / 7);
 
     @include mobile() {
       margin: 0;
@@ -356,7 +339,7 @@ onMounted(async () => {
     height: mobile-vw(400px);
     width: 100%;
 
-    & > img {
+    &>img {
       @include image-default();
       object-fit: contain;
     }
