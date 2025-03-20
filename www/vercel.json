@@ -5,12 +5,12 @@
       "staging": true
     }
   },
-        "buildCommand": {
-          "main": "npm run build",
-          "staging": "npm run generate"
-        },
-        "outputDirector" :{
-          "main": "dist"
-          "staging": "./output/public"
-        }
+  "buildCommand": {
+    "main": "npm run build",
+    "staging": "npm run generate"
+  },
+  "outputDirectory": {
+    "main": "dist",
+    "staging": "./output/public"
+  }
 }
