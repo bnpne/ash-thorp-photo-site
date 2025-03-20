@@ -1,16 +1,13 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "git": {
     "deploymentEnabled": {
       "main": true,
-      "staging": true
+      "staging": {
+        "buildCommand": "npm run generate",
+        "outputDirectory": "./output/public"
+      }
     }
-  },
-  "buildCommand": {
-    "main": "npm run build",
-    "staging": "npm run generate"
-  },
-  "outputDirectory": {
-    "main": "dist",
-    "staging": "./output/public"
   }
 }
