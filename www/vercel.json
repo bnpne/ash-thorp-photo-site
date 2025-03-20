@@ -1,0 +1,24 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "staging": true
+    }
+  },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": {
+        "buildCommand": {
+          "main": "npm run build",
+          "staging": "npm run generate"
+        },
+        "outputDirector" :{
+          "main": "dist"
+          "staging": "./output/public"
+        }
+      }
+    }
+  ]
+}
