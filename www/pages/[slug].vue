@@ -197,7 +197,7 @@ onMounted(async () => {
         id: pageData.value?.audio?.asset.assetId,
         path: pageData.value?.audio?.asset.path,
       },
-      exif: {
+      exif: pageData.value.photo.asset.metadata.exif ? {
         ApertureValue: pageData.value.photo.asset.metadata.exif.ApertureValue
           ? pageData.value.photo.asset.metadata.exif.ApertureValue
           : "null",
@@ -254,7 +254,7 @@ onMounted(async () => {
           x: pageData.value.photo.asset.metadata.exif.FocalPlaneXResolution,
           y: pageData.value.photo.asset.metadata.exif.FocalPlaneYResolution,
         },
-      },
+      } : 'null',
       palette: {
         dominant: pageData.value.photo.asset.metadata.palette.dominant.background,
         muted: pageData.value.photo.asset.metadata.palette.muted.background,
@@ -293,7 +293,7 @@ onMounted(async () => {
     }
 
     // handle exposure time
-    if (pageData.value.photo.asset.metadata.exif.ExposureTime) {
+    if (pageData.value.photo.asset.metadata?.exif?.ExposureTime) {
       let decimal = pageData.value.photo.asset.metadata.exif.ExposureTime;
 
       let fraction = decimalToFraction(decimal);
@@ -377,11 +377,11 @@ onBeforeUnmount(() => {
           <!-- <img :style="{ 'height': '100%', 'aspect-ratio': `${data.photo.asset.metadata.dimensions.aspectRatio}` }" -->
           <!--   :src="data.photo.asset.metadata.lqip" alt=""> -->
         </div>
-        <div :class="{ active: loaded === true }" class="d-container-im">
+        <div :class="{ active: loaded === true }" class="d-container-im" >
           <div ref="gradientElement" class="d-container-im-o" :style="{
             'aspect-ratio': pageData.photo.asset.metadata.dimensions.aspectRatio,
           }">
-            <div class="d-container-im-m" v-if="metadata">
+            <div class="d-container-im-m" v-if='pageData.photo.asset.metadata?.exif'>
               <ul class="d-container-im-m-l">
                 <li v-if="metadata.title">Title: "{{ metadata.title }}",</li>
                 <li v-if="metadata.photoId">Id: {{ metadata.photoId }},</li>
@@ -398,7 +398,7 @@ onBeforeUnmount(() => {
                     <span>},</span>
                   </template>
                 </li>
-                <li v-if="metadata.exif">
+                <li v-if="metadata.exif.ISO !== 'null'">
                   <template v-if="metadata.exif.ISO === 'null'">
                     <span>EXIF: {</span>
                     <span>Null</span>
@@ -453,7 +453,7 @@ onBeforeUnmount(() => {
               </ul>
             </div>
           </div>
-          <img class="d-container-im-e" @click="toggleMetadata" :onload="imageLoaded"
+          <img class="d-container-im-e" @click="pageData.photo.asset.metadata?.exif && toggleMetadata" :onload="imageLoaded"
             :src="`${pageData.photo.asset.url + '?auto=format&w=2000'}`" alt="" />
         </div>
       </div>
@@ -464,7 +464,7 @@ onBeforeUnmount(() => {
           <span v-else> Pause Audio </span>
         </p>
         <div v-if="pageData.photo.asset.metadata" class="d-i-m">
-          <div class="d-i-m-i">
+          <div class="d-i-m-i" v-if='pageData.photo.asset.metadata.exif'>
             <span :style="{ 'text-transform': 'none' }" v-if="pageData.photo.asset.metadata.exif.FNumber">
               f/{{ pageData.photo.asset.metadata.exif.FNumber }}
             </span>
