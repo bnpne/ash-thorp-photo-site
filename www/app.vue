@@ -63,7 +63,7 @@ watch(
         });
       }
     }
-  }
+  },
 );
 
 onMounted(async () => {
@@ -172,7 +172,7 @@ onMounted(async () => {
               from: "edges",
             },
           },
-          "<"
+          "<",
         ).to(
           ".pl",
           {
@@ -180,7 +180,7 @@ onMounted(async () => {
             duration: 1,
             ease: "easeOutQuint",
           },
-          ">+=.6"
+          ">+=.6",
         );
 
         photos.forEach((photo, i) => {
@@ -195,7 +195,7 @@ onMounted(async () => {
                 ease: "easeOutQuint",
                 duration: 1,
               },
-              "<+=.009"
+              "<+=.009",
             );
             tl.from(
               anima,
@@ -204,7 +204,7 @@ onMounted(async () => {
                 duration: 1,
                 ease: "easeOutQuint",
               },
-              "<"
+              "<",
             );
           }
         });
@@ -216,7 +216,7 @@ onMounted(async () => {
             duration: 1,
             ease: "easeOutQuint",
           },
-          "<"
+          "<",
         );
 
         tl.play();
@@ -240,7 +240,7 @@ onMounted(async () => {
             from: "edges",
           },
         },
-        "<"
+        "<",
       ).to(
         ".pl",
         {
@@ -248,7 +248,7 @@ onMounted(async () => {
           duration: 1,
           ease: "easeOutQuint",
         },
-        ">+=.6"
+        ">+=.6",
       );
 
       tl.play();
@@ -263,7 +263,7 @@ onMounted(async () => {
     <Nav />
     <NuxtPage />
     <template v-if="dataStore">
-      <div ref="grid" class="h">
+      <div ref="grid" v-if="route.path === '/'" class="h">
         <template v-for="collection in dataStore.collections">
           <template v-if="dataStore.collections.length > 1">
             <div id="title" class="h-t">
@@ -272,10 +272,18 @@ onMounted(async () => {
           </template>
           <div v-if="collection.photos" class="h-c">
             <template v-if="isMobile === false">
-              <NuxtLink v-for="photo in collection.photos" :to="`/${photo.slug.current}`" class="p"></NuxtLink>
+              <NuxtLink
+                v-for="photo in collection.photos"
+                :to="`/${photo.slug.current}`"
+                class="p"
+              ></NuxtLink>
             </template>
             <template v-else>
-              <NuxtLink v-for="photo in collection.photos" :to="`/${photo.slug.current}`" class="p">
+              <NuxtLink
+                v-for="photo in collection.photos"
+                :to="`/${photo.slug.current}`"
+                class="p"
+              >
                 <img :src="`${photo.photo.asset.url}?auto = format & w=1000`" />
               </NuxtLink>
             </template>
@@ -311,7 +319,13 @@ onMounted(async () => {
     flex-direction: row;
     flex-wrap: wrap;
     margin: 0 calc((100vw / 12) + desktop-vw(20px));
-    gap: calc(((100vw - (((100vw / 12) + desktop-vw(20px)) * 2) - desktop-vw(40px)) - (desktop-vw(150px) * 8)) / 7);
+    gap: calc(
+      (
+          (100vw - (((100vw / 12) + desktop-vw(20px)) * 2) - desktop-vw(40px)) -
+            (desktop-vw(150px) * 8)
+        ) /
+        7
+    );
 
     @include mobile() {
       margin: 0;
@@ -339,7 +353,7 @@ onMounted(async () => {
     height: mobile-vw(400px);
     width: 100%;
 
-    &>img {
+    & > img {
       @include image-default();
       object-fit: contain;
     }
