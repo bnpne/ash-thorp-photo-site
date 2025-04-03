@@ -65,5 +65,11 @@ export default defineType({
         },
       ],
     }),
+    defineField({
+      name: 'ascii',
+      title: 'ASCII Art',
+      type: 'text',
+      readOnly: true,
+    }),
   ],
 })
