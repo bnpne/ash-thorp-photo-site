@@ -27,233 +27,59 @@ useSeoMeta({
 
 import gsap from "gsap";
 
-const { $lenis, $load, $toHome, $toInfo, $loadElements, $loadDetail } =
-  useNuxtApp();
-const route = useRoute();
-const router = useRouter();
-const photos = ref(null);
-const activePhoto = ref(null);
-const activeIndex = ref(null);
-const photoArray = ref(null);
-const grid = ref(null);
-const { isMobile } = useDevice();
+const route = useRoute()
 
-// Query Sanity
-const query = groq`*[_type=='main']{
-  ..., collections[]{
-    ...,
-    photos[]->{..., photo{..., asset->}, audio{..., asset->}}
-  }}`;
-const { data } = useLazySanityQuery(query);
-
-// Data Store
-const dataStore = useData();
-const allPhotos = useAllPhotos();
-
-watch(
-  () => route.params.slug,
-  () => {
-    if (isMobile === false) {
-      if (route.params.slug !== undefined && route.params.slug !== null) {
-        photoArray.value.forEach((photo, i) => {
-          if (route.params.slug === photo.slug.current) {
-            activeIndex.value = i;
-            activePhoto.value = photo;
-          }
-        });
-      }
-    }
-  }
-);
 
 onMounted(async () => {
-  if (isMobile === false) {
-    window.addEventListener("keydown", async (e) => {
-      if (e.key === "Escape") {
-        router.push("/");
+
+  window.addEventListener('keydown', async (e) => {
+    if (route.path !== '/' && route.path !== '/info') {
+      if (e.key === 'Escape') {
+        await navigateTo('/')
       }
-      if (e.key === "ArrowLeft") {
-        if (activeIndex.value !== null) {
-          // -1
-
-          let prevIndex;
-          if (activeIndex.value === 0) {
-            prevIndex = allPhotos.value.length - 1;
-          } else {
-            prevIndex = activeIndex.value - 1;
-          }
-
-          if (prevIndex !== undefined) {
-            await navigateTo(`/${allPhotos.value[prevIndex].slug?.current}`);
-          }
-        }
-      }
-      if (e.key === "ArrowRight") {
-        if (activeIndex.value !== null) {
-          // 1
-
-          let nextIndex;
-          if (activeIndex.value === allPhotos.value.length - 1) {
-            nextIndex = 0;
-          } else {
-            nextIndex = activeIndex.value + 1;
-          }
-
-          if (nextIndex !== undefined) {
-            await navigateTo(`/${allPhotos.value[nextIndex].slug?.current}`);
-          }
-        }
-      }
-    });
-  }
-
-  if (data) {
-    // Load GL
-    dataStore.value = data.value[0];
-    const collections = dataStore.value.collections;
-    const pa = Object.values(collections)
-      .flat()
-      .flatMap((collection) => toRaw(collection.photos));
-
-    photos.value = pa;
-    allPhotos.value = pa;
-    if (isMobile === false) {
-      $load(photos.value);
     }
+  })
 
-    await nextTick();
-    // Load Dom
-    let p = gsap.utils.toArray(".p");
+  await nextTick();
 
-    if (isMobile === false) {
-      $loadElements(p).then(async (photos) => {
-        photoArray.value = photos;
-        await nextTick();
-        let index;
-        if (route.path !== "/" && route.path !== "/info") {
-          photos.forEach((photo, i) => {
-            if (route.params.slug === photo.slug.current) {
-              index = i;
-              activeIndex.value = i;
-              activePhoto.value = photo;
-            }
-          });
-          if (index !== undefined) {
-            let scrollBounds = photos[index].element.getBoundingClientRect();
-            $lenis.scrollTo(scrollBounds.top - window.innerHeight, {
-              immediate: true,
-              force: true,
-              lock: true,
-              onComplete: $loadDetail(index),
-            });
-          }
-        } else if (route.path === "/info") {
-          $toInfo();
-          activePhoto.value = null;
-          activeIndex.value = null;
-        } else {
-          activePhoto.value = null;
-          activeIndex.value = null;
-        }
+  // Play preloader
+  let plt = gsap.utils.toArray(".pl-t span");
+  let tl = gsap.timeline({
+    paused: true,
+  });
+  tl.to(
+    plt,
+    {
+      opacity: 1,
+      delay: 0.5,
+      stagger: {
+        each: 0.3,
+        from: "edges",
+      },
+    },
+    "<",
+  ).to(
+    ".pl",
+    {
+      opacity: 0,
+      duration: 1,
+      ease: "easeOutQuint",
+    },
+    ">+=.6",
+  );
 
-        await nextTick();
-        // Play preloader
-        let plt = gsap.utils.toArray(".pl-t span");
-        let tl = gsap.timeline({
-          paused: true,
-        });
-        tl.to(
-          plt,
-          {
-            opacity: 1,
-            delay: 0.5,
-            stagger: {
-              each: 0.3,
-              from: "edges",
-            },
-          },
-          "<"
-        ).to(
-          ".pl",
-          {
-            opacity: 0,
-            duration: 1,
-            ease: "easeOutQuint",
-          },
-          ">+=.6"
-        );
+  tl.from(
+    ["#title"],
+    {
+      opacity: 0,
+      duration: 1,
+      ease: "easeOutQuint",
+    },
+    "<",
+  );
 
-        photos.forEach((photo, i) => {
-          let anima = photo.mesh.material.uniforms.opacity;
-          let pos = photo.mesh.position;
 
-          if (route.path === "/") {
-            tl.from(
-              pos,
-              {
-                y: photo.mesh.position.y - 150,
-                ease: "easeOutQuint",
-                duration: 1,
-              },
-              "<+=.009"
-            );
-            tl.from(
-              anima,
-              {
-                value: 0,
-                duration: 1,
-                ease: "easeOutQuint",
-              },
-              "<"
-            );
-          }
-        });
-
-        tl.from(
-          ["#title"],
-          {
-            opacity: 0,
-            duration: 1,
-            ease: "easeOutQuint",
-          },
-          "<"
-        );
-
-        tl.play();
-      });
-    } else {
-      if (route.path !== "/") {
-        gsap.to(".h-c", { opacity: 0, ease: "easeOutQuint", duration: 0.6 });
-      }
-
-      let plt = gsap.utils.toArray(".pl-t span");
-      let tl = gsap.timeline({
-        paused: true,
-      });
-      tl.to(
-        plt,
-        {
-          opacity: 1,
-          delay: 0.5,
-          stagger: {
-            each: 0.3,
-            from: "edges",
-          },
-        },
-        "<"
-      ).to(
-        ".pl",
-        {
-          opacity: 0,
-          duration: 1,
-          ease: "easeOutQuint",
-        },
-        ">+=.6"
-      );
-
-      tl.play();
-    }
-  }
+  tl.play();
 });
 </script>
 
@@ -262,87 +88,5 @@ onMounted(async () => {
     <PL />
     <Nav />
     <NuxtPage />
-    <template v-if="dataStore">
-      <div ref="grid" class="h">
-        <template v-for="collection in dataStore.collections">
-          <template v-if="dataStore.collections.length > 1">
-            <div id="title" class="h-t">
-              <h2>{{ collection.title }}</h2>
-            </div>
-          </template>
-          <div v-if="collection.photos" class="h-c">
-            <template v-if="isMobile === false">
-              <NuxtLink v-for="photo in collection.photos" :to="`/${photo.slug.current}`" class="p"></NuxtLink>
-            </template>
-            <template v-else>
-              <NuxtLink v-for="photo in collection.photos" :to="`/${photo.slug.current}`" class="p">
-                <img :src="`${photo.photo.asset.url}?auto = format & w=1000`" />
-              </NuxtLink>
-            </template>
-          </div>
-        </template>
-      </div>
-    </template>
-    <Canvas />
   </main>
 </template>
-
-<style lang="scss">
-.h {
-  // padding: desktop-vw(20px);
-  min-height: 100vh;
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: desktop-vw(40px);
-  padding: desktop-vw(80px) desktop-vw(20px);
-
-  @include mobile() {
-    padding: mobile-vw(80px) mobile-vw(10px);
-    min-height: 100svh;
-  }
-
-  &-c {
-    height: auto;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: 0 calc((100vw / 12) + desktop-vw(20px));
-    gap: calc(((100vw - (((100vw / 12) + desktop-vw(20px)) * 2) - desktop-vw(40px)) - (desktop-vw(150px) * 8)) / 7);
-
-    @include mobile() {
-      margin: 0;
-      gap: mobile-vw(40px);
-      flex-direction: column;
-      flex-wrap: nowrap;
-    }
-  }
-
-  &-t {
-    margin: 0 calc((100vw / 12) + desktop-vw(20px));
-
-    @include mobile() {
-      margin: 0;
-    }
-  }
-}
-
-.p {
-  display: block;
-  height: desktop-vw(150px);
-  width: desktop-vw(150px);
-
-  @include mobile() {
-    height: mobile-vw(400px);
-    width: 100%;
-
-    &>img {
-      @include image-default();
-      object-fit: contain;
-    }
-  }
-}
-</style>
