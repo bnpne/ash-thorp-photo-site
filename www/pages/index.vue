@@ -29,10 +29,6 @@ const query = groq`*[_type=='main'][0]{
     photos[]->{..., photo{..., asset}, audio{..., asset->}}
   }}`;
 const { data } = useLazySanityQuery(query);
-
-onMounted(() => {
-  console.log(data.value)
-})
 </script>
 
 <template>

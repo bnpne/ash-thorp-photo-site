@@ -62,6 +62,7 @@ const triggerAudio = () => {
 };
 
 const imageLoaded = () => {
+  console.log('toggled')
   loaded.value = true;
 };
 
@@ -93,7 +94,6 @@ const query = groq`*[_type=='photoBase' && slug.current == $slug][0]{
 const { data } = useSanityQuery(query, { slug: route.params.slug });
 
 onMounted(async () => {
-  console.log(data.value)
   gsap.set([document.body], { color: '#ffffff', background: '#000000' })
 
   if (data.value.photo.asset.metadata.palette.dominant) {
@@ -116,83 +116,7 @@ onMounted(async () => {
     }
   }
 
-
-  // if (pageData.value) {
-  //   // create gradient
-  //   if (pageData.value.photo.asset.metadata.palette.dominant) {
-  //     let darkVibrant =
-  //       pageData.value.photo.asset.metadata.palette.darkVibrant.background;
-  //     let darkMuted =
-  //       pageData.value.photo.asset.metadata.palette.darkMuted.background;
-  //     let lightMuted =
-  //       pageData.value.photo.asset.metadata.palette.lightMuted.background;
-  //     let lightVibrant =
-  //       pageData.value.photo.asset.metadata.palette.lightVibrant.background;
-  //
-  //     gradient.darkVibrant = darkVibrant;
-  //     gradient.darkMuted = darkMuted;
-  //     gradient.lightMuted = lightMuted;
-  //     gradient.lightVibrant = lightVibrant;
-  //
-  //     if (gradientElement.value) {
-  //       gradientElement.value.style.background = `linear-gradient(70deg, ${gradient.lightVibrant}, ${gradient.lightMuted}, ${gradient.darkMuted})`;
-  //     }
-  //   }
-  //
-  //   // intro animation
-  //   let intro = gsap.timeline({ paused: true });
-  //
-  //   if (isMobile === true) {
-  //     intro.to(
-  //       [document.body],
-  //       {
-  //         background: "#000000",
-  //         duration: 1,
-  //         color: "#ffffff",
-  //         ease: "custom",
-  //       },
-  //       "<",
-  //     );
-  //     intro.to(
-  //       [".n"],
-  //       {
-  //         duration: 1,
-  //         color: "#ffffff",
-  //         ease: "custom",
-  //       },
-  //       "<",
-  //     );
-  //   }
-  //
-  //   intro
-  //     .to(
-  //       ".d-i",
-  //       {
-  //         opacity: 1,
-  //         duration: waiting.value ? 1 : 0.6,
-  //         delay: waiting.value ? 1.2 : 0,
-  //         ease: "easeOutQuint",
-  //       },
-  //       "<",
-  //     )
-  //     .from(
-  //       ".d-container",
-  //       {
-  //         opacity: 0,
-  //         duration: waiting.value ? 1 : 0.6,
-  //         ease: "easeOutQuint",
-  //       },
-  //       "<",
-  //     );
-  //
-  //   intro.play();
-  //
-  //   // handle audio
-  //   if (pageData.value.audio !== null) {
-  //     audio.value = new Audio(pageData.value.audio.asset.url);
-  //     audio.value.loop = true;
-  //   }
-  // }
+  if (loaded.value === false) loaded.value = true
 });
 
 onBeforeUnmount(() => {

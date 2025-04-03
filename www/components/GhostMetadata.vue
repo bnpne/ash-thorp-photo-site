@@ -3,8 +3,6 @@ import { PortableText } from '@portabletext/vue'
 import { h } from 'vue'
 const props = defineProps(['blocks'])
 
-console.log(props.blocks)
-
 const components = {
   block: {
     normal: ({ children }) =>
@@ -41,11 +39,13 @@ const components = {
   </div>
 </template>
 
-<style>
+<style lang="scss">
 .ghost {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 6px;
-  line-height: 1.25;
+  // font-size: desktop-vw(5px);
+  font-size: .55em;
+
+  line-height: 1.15;
   white-space: pre;
   overflow: scroll;
 }
