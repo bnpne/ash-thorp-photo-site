@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@nuxtjs/sanity": "^1.11.4",
+    "@portabletext/vue": "^1.0.12",
     "@sanity/client": "^6.28.4",
     "blurhash": "^2.0.5",
     "date-fns": "^3.6.0",

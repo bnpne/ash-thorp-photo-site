@@ -40,23 +40,13 @@ definePageMeta({
 });
 
 const route = useRoute();
-const slug = ref(null);
-const dataStore = useData();
-const allPhotos = ref(null);
-const pageData = ref(null)
-const isUntitled = ref(false);
 const audio = ref(null);
 const audioIsPlaying = ref(false);
 const loaded = ref(false);
-const index = ref();
-const app = useNuxtApp();
 const ss = ref(null);
 const gradient = reactive({ lightVibrant: null, darkVibrant: null });
 const gradientElement = ref(null);
 const metadataActive = ref(false);
-const metadata = ref(null);
-const waiting = useWaiting();
-const { isMobile } = useDevice();
 
 
 const triggerAudio = () => {
@@ -221,13 +211,13 @@ onBeforeUnmount(() => {
           <img :style="{ 'height': '100%', 'aspect-ratio': `${data.photo.asset.metadata.dimensions.aspectRatio}` }"
             :src="data.photo.asset.metadata.lqip" alt="">
         </div>
-        <div :class="{ active: loaded === true }" class="d-container-im" >
+        <div :class="{ active: loaded === true }" class="d-container-im">
           <div ref="gradientElement" class="d-container-im-o" :style="{
             'aspect-ratio':
               data.photo.asset.metadata.dimensions.aspectRatio,
           }">
-            <div class="d-container-im-m">
-
+            <div class="d-container-im-m" v-if='data.ghostMeta'>
+              <GhostMetadata :blocks='data.ghostMeta' />
             </div>
           </div>
           <img class="d-container-im-e" @click="toggleMetadata" :onload="imageLoaded"
@@ -353,6 +343,7 @@ onBeforeUnmount(() => {
         padding: desktop-vw(20px);
         color: #000000;
         /* mix-blend-mode: difference; */
+        overflow: scroll;
 
         @include mobile() {
           padding: mobile-vw(10px);
