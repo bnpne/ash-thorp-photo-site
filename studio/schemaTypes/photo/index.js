@@ -13,7 +13,7 @@ export default defineType({
         metadata: ['exif', 'palette', 'location'],
         storeOriginalFilename: true,
       },
-      validation: r => r.required(),
+      validation: (r) => r.required(),
     }),
     defineField({
       name: 'title',
@@ -28,9 +28,8 @@ export default defineType({
         'A Slug is the endpoint for the photo detail page. For instance `this-photo` slug will be reached at `www.your-website.com/this-photo`. This will autogenerate based on the photo title, but can be changed. Please add a hyphen `-` instead of spaces.',
       options: {
         source: 'title',
-        maxLength: 200, // will be ignored if slugify is set
-        slugify: input =>
-          input.toLowerCase().replace(/\s+/g, '-').slice(0, 200),
+        maxLength: 200,
+        slugify: (input) => input.toLowerCase().replace(/\s+/g, '-').slice(0, 200),
       },
     }),
     defineField({
@@ -43,6 +42,34 @@ export default defineType({
       name: 'audio',
       title: 'Audio File',
       type: 'file',
+    }),
+    defineField({
+      name: 'ghostMeta',
+      title: 'Ghost Metadata',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [
+            {title: 'Normal', value: 'normal'},
+            {title: 'Code', value: 'code'},
+            {title: 'ASCII', value: 'ascii'}, // optional: custom style
+          ],
+          marks: {
+            decorators: [
+              {title: 'Strong', value: 'strong'},
+              {title: 'Emphasis', value: 'em'},
+              {title: 'Code', value: 'code'},
+            ],
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: 'ascii',
+      title: 'ASCII Art',
+      type: 'text',
+      readOnly: true,
     }),
   ],
 })

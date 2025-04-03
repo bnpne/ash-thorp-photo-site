@@ -2,65 +2,39 @@
 import gsap from 'gsap'
 
 definePageMeta({
-  middleware: [
-    function (to, from) {
-      const info = toInfo()
-      if (from.path === '/') info.value = true
-    }
-  ],
   pageTransition: {
     css: false,
     name: 'info',
     mode: 'out-in',
     onEnter(el, done) {
-      // let intro = gsap.timeline({ paused: true, onComplete: () => done() })
-      // intro.to('#i-a', {
-      //   opacity: 1,
-      //   duration: .6,
-      //   ease: 'easeOutQuint',
-      // }, '<')
-      //   .to('#i-a', {
-      //     opacity: 1,
-      //     duration: .6,
-      //     ease: 'easeOutQuint',
-      //   }, '<')
-      //
-      // intro.play()
-      done()
+      let intro = gsap.timeline({ paused: true, onComplete: () => done() });
+      intro
+        .from(
+          el,
+          {
+            opacity: 0,
+            duration: 1,
+            ease: "easeOutQuint",
+          },
+          "<",
+        )
+
+      intro.play();
     },
     onLeave(el, done) {
-      const { $toHome } = useNuxtApp()
-      const info = toInfo()
-      const { isMobile } = useDevice();
-
-      info.value = false
-
-      if (isMobile === false) {
-        let intro = gsap.timeline({
-          paused: true, onComplete: () => {
-            $toHome()
-            done()
-          }
-        })
-        intro.to('#i-a', {
-          opacity: 0,
-          duration: .6,
-          ease: 'easeOutQuint',
-        }, '<')
-          .to('#i-a', {
+      let intro = gsap.timeline({ paused: true, onComplete: () => done() });
+      intro
+        .to(
+          el,
+          {
             opacity: 0,
-            duration: .6,
-            ease: 'easeOutQuint',
-          }, '<')
+            duration: 1,
+            ease: "easeOutQuint",
+          },
+          "<",
+        )
 
-        intro.play()
-      } else {
-        let intro = gsap.timeline({ paused: true, onComplete: () => done() })
-        intro.to('.h-c', { opacity: 0, ease: 'easeOutQuint', duration: .6 }, '<')
-        // intro.to('.n', { color: '#ffffff', ease: 'easeOutQuint', duration: .6 }, '<')
-        // intro.to([document.body], { color: '#ffffff', background: '#000000', ease: 'easeOutQuint', duration: .6 }, '<')
-        intro.play()
-      }
+      intro.play();
     },
   },
 })
