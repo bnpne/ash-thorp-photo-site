@@ -96,11 +96,17 @@ const handleNavLeft = async () => {
   await navigateTo(`/${all.value[prevIndex.value].slug}`)
 }
 
-// const query = groq`*[_type=='photoBase' && slug.current == $slug][0]{
-//     ...,
-//     photo{..., asset->}, 
-//     audio{..., asset->}
-//   }`;
+// Define the event handler once
+const handleKeyDown = (e) => {
+  if (e.key === 'ArrowRight') {
+    handleNavRight();
+  }
+  if (e.key === 'ArrowLeft') {
+    handleNavLeft();
+  }
+};
+
+
 const query = groq`
   {
     "case": *[_type == 'photoBase' && slug.current == $slug][0] {
@@ -147,7 +153,7 @@ onMounted(async () => {
     })
   }
 
-
+  window.addEventListener('keydown', handleKeyDown);
 
   if (data.value.case.photo.asset.metadata.palette.dominant) {
     let darkVibrant =
@@ -177,6 +183,10 @@ onBeforeUnmount(() => {
     audio.value.pause();
     audio.value = null;
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
 });
 </script>
 

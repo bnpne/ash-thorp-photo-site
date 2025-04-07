@@ -43,7 +43,7 @@ const components = {
 .ghost {
   font-family: 'IBM Plex Mono', monospace;
   // font-size: desktop-vw(5px);
-  font-size: .55em;
+  font-size: .35em;
 
   line-height: 1.15;
   white-space: pre;
