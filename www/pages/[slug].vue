@@ -47,7 +47,10 @@ const ss = ref(null);
 const gradient = reactive({ lightVibrant: null, darkVibrant: null });
 const gradientElement = ref(null);
 const metadataActive = ref(false);
-
+const all = ref(null)
+const thisIndex = ref(null)
+const nextIndex = ref(null)
+const prevIndex = ref(null)
 
 const triggerAudio = () => {
   if (audio.value !== null) {
@@ -62,7 +65,6 @@ const triggerAudio = () => {
 };
 
 const imageLoaded = () => {
-  console.log('toggled')
   loaded.value = true;
 };
 
@@ -86,25 +88,76 @@ const toggleMetadata = () => {
   }
 };
 
-const query = groq`*[_type=='photoBase' && slug.current == $slug][0]{
-    ...,
-    photo{..., asset->}, 
-    audio{..., asset->}
-  }`;
+const handleNavRight = async () => {
+  await navigateTo(`/${all.value[nextIndex.value].slug}`)
+}
+
+const handleNavLeft = async () => {
+  await navigateTo(`/${all.value[prevIndex.value].slug}`)
+}
+
+// const query = groq`*[_type=='photoBase' && slug.current == $slug][0]{
+//     ...,
+//     photo{..., asset->}, 
+//     audio{..., asset->}
+//   }`;
+const query = groq`
+  {
+    "case": *[_type == 'photoBase' && slug.current == $slug][0] {
+      ...,
+      photo{..., asset->}, 
+      audio{..., asset->}
+    },
+    "all": *[_type == 'main'][0] {
+      collections[] {
+        photos[]-> {
+          slug,
+        }
+      }
+    }
+  }
+`
 const { data } = useSanityQuery(query, { slug: route.params.slug });
 
 onMounted(async () => {
   gsap.set([document.body], { color: '#ffffff', background: '#000000' })
 
-  if (data.value.photo.asset.metadata.palette.dominant) {
+  if (data.value.all) {
+    all.value = toRaw(data.value).all?.collections
+      .map(a => a.photos.map(p => ({ slug: p.slug.current })))
+      .flat();
+
+
+    all.value.forEach((a, i) => {
+      if (a.slug === route.params.slug) {
+        thisIndex.value = i
+
+        if (i === all.value.length - 1) {
+          nextIndex.value = 0
+        } else {
+          nextIndex.value = i + 1
+        }
+
+        if (i === 0) {
+          prevIndex.value = all.value.length - 1
+        } else {
+          prevIndex.value = i - 1
+        }
+      }
+    })
+  }
+
+
+
+  if (data.value.case.photo.asset.metadata.palette.dominant) {
     let darkVibrant =
-      data.value.photo.asset.metadata.palette.darkVibrant.background;
+      data.value.case.photo.asset.metadata.palette.darkVibrant.background;
     let darkMuted =
-      data.value.photo.asset.metadata.palette.darkMuted.background;
+      data.value.case.photo.asset.metadata.palette.darkMuted.background;
     let lightMuted =
-      data.value.photo.asset.metadata.palette.lightMuted.background;
+      data.value.case.photo.asset.metadata.palette.lightMuted.background;
     let lightVibrant =
-      data.value.photo.asset.metadata.palette.lightVibrant.background;
+      data.value.case.photo.asset.metadata.palette.lightVibrant.background;
 
     gradient.darkVibrant = darkVibrant;
     gradient.darkMuted = darkMuted;
@@ -128,47 +181,51 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div id="page" v-if='data' class="d">
+  <div id="page" v-if='data?.case' class="d">
     <div class="d-c">
+      <div class="navigate">
+        <div @click="handleNavLeft" class="navigate-l"></div>
+        <div @click="handleNavRight" class="navigate-r"></div>
+      </div>
       <div class="d-container">
         <div :class="{ active: loaded === false }" class="d-container-im">
-          <img :style="{ 'height': '100%', 'aspect-ratio': `${data.photo.asset.metadata.dimensions.aspectRatio}` }"
-            :src="data.photo.asset.metadata.lqip" alt="">
+          <img :style="{ 'height': '100%', 'aspect-ratio': `${data.case.photo.asset.metadata.dimensions.aspectRatio}` }"
+            :src="data.case.photo.asset.metadata.lqip" alt="">
         </div>
         <div :class="{ active: loaded === true }" class="d-container-im">
           <div ref="gradientElement" class="d-container-im-o" :style="{
             'aspect-ratio':
-              data.photo.asset.metadata.dimensions.aspectRatio,
+              data.case.photo.asset.metadata.dimensions.aspectRatio,
           }">
-            <div class="d-container-im-m" v-if='data.ghostMeta'>
-              <GhostMetadata :blocks='data.ghostMeta' />
+            <div class="d-container-im-m" v-if='data.case.ghostMeta'>
+              <GhostMetadata :blocks='data.case.ghostMeta' />
             </div>
           </div>
           <img class="d-container-im-e" @click="toggleMetadata" :onload="imageLoaded"
-            :src="`${data.photo.asset.url + '?auto=format&w=2000'}`" alt="" />
+            :src="`${data.case.photo.asset.url + '?auto=format&w=2000'}`" alt="" />
         </div>
       </div>
       <div class="d-i">
-        <p class="d-i-t">{{ data.title }}</p>
-        <p @click="triggerAudio" class="d-i-a" v-if="data.audio">
+        <p class="d-i-t">{{ data.case.title }}</p>
+        <p @click="triggerAudio" class="d-i-a" v-if="data.case.audio">
           <span v-if="audioIsPlaying === false"> Play Audio </span>
           <span v-else> Pause Audio </span>
         </p>
-        <div v-if="data.photo.asset.metadata" class="d-i-m">
+        <div v-if="data.case.photo.asset.metadata" class="d-i-m">
           <div class="d-i-m-i">
-            <span :style="{ 'text-transform': 'none' }" v-if="data.photo.asset.metadata?.exif?.FNumber">
-              f/{{ data.photo.asset.metadata.exif.FNumber }}
+            <span :style="{ 'text-transform': 'none' }" v-if="data.case.photo.asset.metadata?.exif?.FNumber">
+              f/{{ data.case.photo.asset.metadata.exif.FNumber }}
             </span>
             <span v-if="
-              data.photo.asset.metadata?.exif?.ExposureTime && ss !== null
+              data.case.photo.asset.metadata?.exif?.ExposureTime && ss !== null
             ">
               {{ ss }}
             </span>
-            <span v-if="data.photo.asset.metadata?.exif?.ISO">
-              ISO {{ data.photo.asset.metadata.exif.ISO }}
+            <span v-if="data.case.photo.asset.metadata?.exif?.ISO">
+              ISO {{ data.case.photo.asset.metadata.exif.ISO }}
             </span>
-            <span v-if="data.photo.asset.metadata?.exif">
-              CS {{ data.photo.asset.metadata.exif.ColorSpace }}
+            <span v-if="data.case.photo.asset.metadata?.exif">
+              CS {{ data.case.photo.asset.metadata.exif.ColorSpace }}
             </span>
           </div>
         </div>
@@ -285,7 +342,7 @@ onBeforeUnmount(() => {
             gap: 0;
           }
 
-          & > li {
+          &>li {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -363,8 +420,8 @@ onBeforeUnmount(() => {
         flex: 0 0 25%;
       }
 
-      & > span {
-        & > svg {
+      &>span {
+        &>svg {
           display: inline-block;
           height: desktop-vw(12px);
           width: desktop-vw(9px);
