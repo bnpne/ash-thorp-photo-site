@@ -51,6 +51,7 @@ const all = ref(null)
 const thisIndex = ref(null)
 const nextIndex = ref(null)
 const prevIndex = ref(null)
+const coverImg = ref(null)
 
 const triggerAudio = () => {
   if (audio.value !== null) {
@@ -79,12 +80,17 @@ const toggleMetadata = () => {
       ease: "easeOutQuint",
       duration: 0.6,
     });
+
+    coverImg.value.style.pointerEvents = 'none'
+    gradientElement.value.style.pointerEvents = 'auto'
   } else {
     gsap.to(gradientElement.value, {
       opacity: 0,
       ease: "easeOutQuint",
       duration: 0.6,
     });
+    coverImg.value.style.pointerEvents = 'auto'
+    gradientElement.value.style.pointerEvents = 'none'
   }
 };
 
@@ -203,15 +209,15 @@ onUnmounted(() => {
             :src="data.case.photo.asset.metadata.lqip" alt="">
         </div>
         <div :class="{ active: loaded === true }" class="d-container-im">
-          <div ref="gradientElement" class="d-container-im-o" :style="{
+          <div ref="gradientElement" class="d-container-im-o" data-lenis-prevent :style="{
             'aspect-ratio':
               data.case.photo.asset.metadata.dimensions.aspectRatio,
           }">
             <div class="d-container-im-m" v-if='data.case.ghostMeta'>
-              <GhostMetadata :blocks='data.case.ghostMeta' />
+              <GhostMetadata :blocks='data.case.ghostMeta' @click="toggleMetadata" />
             </div>
           </div>
-          <img class="d-container-im-e" @click="toggleMetadata" :onload="imageLoaded"
+          <img ref='coverImg' class="d-container-im-e" @click="toggleMetadata" :onload="imageLoaded"
             :src="`${data.case.photo.asset.url + '?auto=format&w=2000'}`" alt="" />
         </div>
       </div>
