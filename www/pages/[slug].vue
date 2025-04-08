@@ -240,7 +240,7 @@ onUnmounted(() => {
           </template>
 
           <img ref='coverImg' class="d-container-im-e" @click="toggleMetadata" :onload="imageLoaded"
-            :src="`${data.case.photo.asset.url + '?auto=format&w=2000'}`" alt="" />
+            :src="`${data.case.photo.asset.url + '?auto=format&w=3000'}`" alt="" />
         </div>
       </div>
       <div class="d-i">
