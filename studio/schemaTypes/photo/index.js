@@ -16,6 +16,15 @@ export default defineType({
       validation: (r) => r.required(),
     }),
     defineField({
+      name: 'negative',
+      title: 'Negative',
+      type: 'image',
+      options: {
+        metadata: ['exif', 'palette', 'location'],
+        storeOriginalFilename: true,
+      },
+    }),
+    defineField({
       name: 'title',
       title: 'Photo Title',
       type: 'string',
@@ -29,7 +38,7 @@ export default defineType({
       options: {
         source: 'title',
         maxLength: 200,
-        slugify: (input) => input.toLowerCase().replace(/\s+/g, '-').slice(0, 200),
+        slugify: (input) => (input || '').toLowerCase().replace(/\s+/g, '-').slice(0, 200),
       },
     }),
     defineField({

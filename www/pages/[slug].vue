@@ -118,6 +118,7 @@ const query = groq`
     "case": *[_type == 'photoBase' && slug.current == $slug][0] {
       ...,
       photo{..., asset->}, 
+      negative{..., asset->}, 
       audio{..., asset->}
     },
     "all": *[_type == 'main'][0] {
@@ -176,8 +177,15 @@ onMounted(async () => {
     gradient.lightMuted = lightMuted;
     gradient.lightVibrant = lightVibrant;
 
-    if (gradientElement.value) {
+    if (gradientElement.value && !data.value.case.negative) {
       gradientElement.value.style.background = `linear-gradient(70deg, ${gradient.lightVibrant}, ${gradient.lightMuted}, ${gradient.darkMuted})`;
+    }
+
+    if (data.value.case.negative) {
+      console.log('here')
+      gradientElement.value.style.backgroundImage = `url("${data.value.case.negative.asset.url}?auto=format&w=2000")`;
+      gradientElement.value.style.backgroundPosition = 'center'
+      gradientElement.value.style.backgroundSize = 'contain'
     }
   }
 
@@ -209,14 +217,28 @@ onUnmounted(() => {
             :src="data.case.photo.asset.metadata.lqip" alt="">
         </div>
         <div :class="{ active: loaded === true }" class="d-container-im">
-          <div ref="gradientElement" class="d-container-im-o" data-lenis-prevent :style="{
-            'aspect-ratio':
-              data.case.photo.asset.metadata.dimensions.aspectRatio,
-          }">
-            <div class="d-container-im-m" v-if='data.case.ghostMeta'>
-              <GhostMetadata :blocks='data.case.ghostMeta' @click="toggleMetadata" />
+          <template v-if='data.case?.negative'>
+            <div ref="gradientElement" class="d-container-im-o" data-lenis-prevent :style="{
+              'aspect-ratio':
+                data.case.photo.asset.metadata.dimensions.aspectRatio,
+            }">
+              <div class="d-container-im-m" v-if='data.case.ghostMeta'
+                :style="{ mixBlendMode: 'difference', background: 'black', color: 'white' }">
+                <GhostMetadata :blocks='data.case.ghostMeta' @click="toggleMetadata" />
+              </div>
             </div>
-          </div>
+          </template>
+          <template v-else>
+            <div ref="gradientElement" class="d-container-im-o" data-lenis-prevent :style="{
+              'aspect-ratio':
+                data.case.photo.asset.metadata.dimensions.aspectRatio,
+            }">
+              <div class="d-container-im-m" v-if='data.case.ghostMeta'>
+                <GhostMetadata :blocks='data.case.ghostMeta' @click="toggleMetadata" />
+              </div>
+            </div>
+          </template>
+
           <img ref='coverImg' class="d-container-im-e" @click="toggleMetadata" :onload="imageLoaded"
             :src="`${data.case.photo.asset.url + '?auto=format&w=2000'}`" alt="" />
         </div>
@@ -456,6 +478,13 @@ onUnmounted(() => {
         align-items: flex-end;
       }
     }
+  }
+
+  .negative {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 </style>
