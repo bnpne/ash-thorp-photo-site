@@ -116,7 +116,7 @@ onMounted(() => {
           <li>Credits</li>
           <li>Web Dev & Design</li>
           <li>
-            <NuxtLink to='mailto:bentppaine@gmail.com' target='blank' ref='noreferrer'>Ben Paine</NuxtLink>
+            <NuxtLink to='mailto:bentppaine@gmail.com' ref='noreferrer'>Ben Paine</NuxtLink>
           </li>
           <li>
             <NuxtLink to='https://instagram.com/bnpne' target='blank' ref='noreferrer'>Instagram</NuxtLink>
