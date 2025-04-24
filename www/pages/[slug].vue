@@ -295,7 +295,7 @@ onUnmounted(() => {
     pointer-events: auto;
 
     @include mobile() {
-      width: 50%;
+      width: 15%;
     }
   }
 
