@@ -133,8 +133,7 @@ function createClientFromEnv() {
     projectId: 'k3z72agi',
     dataset: 'production',
     apiVersion: '2025-10-15',
-    token:
-      'sknGPZQxg68DaKNgwQJLGc82qLwGBNvjJyL1P0z366JK9t7bEwvXNOvv6julQiRYlfg9WElGGVqtnbUG0Wp2QyTjH59yy609euDG81tzs9PjgJgmvVWvYhGEydCeee6UdmhNSIdX3Bk7ANMvLufLFFAYWOcLeTXk4XNEm51ohpp7RtzW0xwN',
+    token: '',
     useCdn: false,
     perspective: 'raw',
   })
@@ -212,10 +211,9 @@ async function ensureAssetReference(client, specifier, context) {
     return assetCache.get(sha1)
   }
 
-  const existing = await client.fetch(
-    '*[_type == "sanity.imageAsset" && sha1hash == $sha1][0]',
-    {sha1},
-  )
+  const existing = await client.fetch('*[_type == "sanity.imageAsset" && sha1hash == $sha1][0]', {
+    sha1,
+  })
 
   if (existing && existing._id) {
     console.log(`  • Reusing existing image asset for ${assetFilename} -> ${existing._id}`)
