@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   ssr: true,
 
   sanity: {
-    projectId: process.env.NUXT_SANITY_ID,
+    projectId: "k3z72agi",
     dataset: "production",
     useCdn: true,
     apiVersion: "2023-05-03",
